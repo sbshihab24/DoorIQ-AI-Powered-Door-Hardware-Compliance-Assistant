@@ -25,6 +25,7 @@ class CodeReference(BaseModel):
 
 class ChatResponse(BaseModel):
     session_id: str
+    intent: str | None = None
     answer: str
     requirements: list[str] = Field(default_factory=list)
     allowed_options: list[str] = Field(default_factory=list)
