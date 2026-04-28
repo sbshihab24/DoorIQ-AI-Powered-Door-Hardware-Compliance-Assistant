@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas.common import BuildingContext, LocationInput
 
@@ -26,12 +26,12 @@ class CodeReference(BaseModel):
 class ChatResponse(BaseModel):
     session_id: str
     answer: str
-    requirements: list[str] = []
-    allowed_options: list[str] = []
-    risky_or_not_allowed: list[str] = []
-    recommended_products: list[RecommendedProduct] = []
-    code_references: list[CodeReference] = []
-    missing_information: list[str] = []
+    requirements: list[str] = Field(default_factory=list)
+    allowed_options: list[str] = Field(default_factory=list)
+    risky_or_not_allowed: list[str] = Field(default_factory=list)
+    recommended_products: list[RecommendedProduct] = Field(default_factory=list)
+    code_references: list[CodeReference] = Field(default_factory=list)
+    missing_information: list[str] = Field(default_factory=list)
     should_capture_lead: bool = False
     confidence: str
     human_review_recommended: bool = False
