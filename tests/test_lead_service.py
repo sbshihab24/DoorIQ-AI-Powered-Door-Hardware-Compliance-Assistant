@@ -1,0 +1,30 @@
+from app.schemas.chat import ChatRequest
+from app.services.lead_service import should_capture_lead
+
+
+def test_should_capture_lead_for_quote_request() -> None:
+    request = ChatRequest(message="Can you send me a quote for this hardware?")
+
+    assert should_capture_lead(request) is True
+
+
+def test_should_capture_lead_when_project_context_is_complete() -> None:
+    request = ChatRequest(
+        message="What hardware should I use?",
+        building={
+            "building_type": "office",
+            "application": "egress door",
+        },
+        location={
+            "state": "TX",
+            "zip_code": "75001",
+        },
+    )
+
+    assert should_capture_lead(request) is True
+
+
+def test_should_not_capture_lead_for_basic_incomplete_question() -> None:
+    request = ChatRequest(message="What is a door closer?")
+
+    assert should_capture_lead(request) is False
