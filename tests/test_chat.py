@@ -1,5 +1,7 @@
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 
+from app.db.models import ChatMessage, ChatSession
 from app.main import app
 
 
@@ -60,3 +62,74 @@ def test_chat_returns_dataset_knowledge_references() -> None:
         reference["title"] for reference in data["knowledge_references"]
     ]
     assert "Dataset Implementation Note" in reference_titles
+
+
+def test_chat_persists_session_and_messages(db_session: Session) -> None:
+    response = client.post(
+        "/chat",
+        json={
+            "message": "What hardware do I need?",
+            "building": {
+                "building_type": "office",
+                "application": "egress door",
+            },
+            "location": {
+                "state": "TX",
+                "zip_code": "75001",
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    session_id = response.json()["session_id"]
+
+    chat_session = db_session.get(ChatSession, session_id)
+    messages = (
+        db_session.query(ChatMessage)
+        .filter(ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.id)
+        .all()
+    )
+
+    assert chat_session is not None
+    assert chat_session.building_type == "office"
+    assert chat_session.application == "egress door"
+    assert chat_session.state == "TX"
+    assert chat_session.zip_code == "75001"
+    assert [(message.role, message.content) for message in messages] == [
+        ("user", "What hardware do I need?"),
+        (
+            "assistant",
+            "Hardware recommendations depend on door application, traffic level, egress use, access control intent, and rating needs.",
+        ),
+    ]
+
+
+def test_chat_reuses_existing_session(db_session: Session) -> None:
+    first_response = client.post("/chat", json={"message": "Do I need panic hardware?"})
+    session_id = first_response.json()["session_id"]
+
+    second_response = client.post(
+        "/chat",
+        json={
+            "session_id": session_id,
+            "message": "Can I use a maglock too?",
+        },
+    )
+
+    assert second_response.status_code == 200
+    assert second_response.json()["session_id"] == session_id
+
+    messages = (
+        db_session.query(ChatMessage)
+        .filter(ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.id)
+        .all()
+    )
+
+    assert [message.role for message in messages] == [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+    ]

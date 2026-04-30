@@ -27,4 +27,8 @@ PROJECT_PLAN.md
 *.log
 
 *.sqlite3
+*.sqlite3-*
+*.sqlite
+*.sqlite-*
 *.db
+*.db-*

@@ -1,5 +1,8 @@
 from uuid import uuid4
 
+from sqlalchemy.orm import Session
+
+from app.db.models import ChatMessage, ChatSession
 from app.schemas.chat import (
     ChatRequest,
     ChatResponse,
@@ -147,3 +150,54 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
             confidence,
         ),
     )
+
+
+def get_or_create_chat_session(db: Session, request: ChatRequest, session_id: str) -> ChatSession:
+    chat_session = db.get(ChatSession, session_id)
+
+    if chat_session is None:
+        chat_session = ChatSession(id=session_id)
+        db.add(chat_session)
+
+    if request.building:
+        if request.building.building_type is not None:
+            chat_session.building_type = request.building.building_type
+        if request.building.application is not None:
+            chat_session.application = request.building.application
+
+    if request.location:
+        if request.location.state is not None:
+            chat_session.state = request.location.state
+        if request.location.zip_code is not None:
+            chat_session.zip_code = request.location.zip_code
+
+    return chat_session
+
+
+def save_chat_exchange(
+    db: Session,
+    request: ChatRequest,
+    response: ChatResponse,
+) -> None:
+    get_or_create_chat_session(db, request, response.session_id)
+    db.add_all(
+        [
+            ChatMessage(
+                session_id=response.session_id,
+                role="user",
+                content=request.message,
+            ),
+            ChatMessage(
+                session_id=response.session_id,
+                role="assistant",
+                content=response.answer,
+            ),
+        ]
+    )
+    db.commit()
+
+
+def build_and_save_chat_response(db: Session, request: ChatRequest) -> ChatResponse:
+    response = build_chat_response(request)
+    save_chat_exchange(db, request, response)
+    return response
