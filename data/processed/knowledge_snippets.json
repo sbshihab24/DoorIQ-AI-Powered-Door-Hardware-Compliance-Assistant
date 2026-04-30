@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Dataset Implementation Note",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "The training dataset is a structured starter dataset, not a replacement for official or licensed jurisdictional code text.",
+    "tags": ["code", "jurisdiction", "local code", "applicable_code_lookup"]
+  },
+  {
+    "title": "ZIP-Based Local Code Resolution",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "Local-code precision requires resolving ZIP to city, county, and state, then checking state adoption plus city or county amendments.",
+    "tags": ["zip", "city", "county", "state", "jurisdiction", "applicable_code_lookup"]
+  },
+  {
+    "title": "Product Recommendation Conditions",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "Product recommendations should be conditioned on occupancy, egress role, fire rating, accessibility path, and local amendments.",
+    "tags": ["product_match", "hardware_allowance", "egress", "fire_rating", "accessibility"]
+  },
+  {
+    "title": "Hospital Main Entrance Seed Case",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "For a hospital main entrance, ask for state and ZIP, new versus existing work, and automatic-door preference; cover IBC, NFPA, ADA, accessible entrance count, likely operator, storefront or entrance options, panic hardware, and code links.",
+    "tags": ["hospital", "main entrance", "automatic_operator_recommendation", "accessibility_analysis", "applicable_code_lookup"]
+  },
+  {
+    "title": "Maglock Seed Case",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "For magnetic locks, ask for jurisdiction, occupancy, fire rating, and egress-path role; answer should cover permissibility, release method, listed components, and fallback options.",
+    "tags": ["maglock", "maglock_analysis", "access control", "egress", "fire rating"]
+  },
+  {
+    "title": "Masonry Frame Seed Case",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "For a masonry opening, compare KD masonry frames and welded frames, and ask for wall type, interior or exterior use, and required rating.",
+    "tags": ["masonry", "frame", "product_match", "kd masonry frame", "welded frame"]
+  },
+  {
+    "title": "Fire-Rated Lite Seed Case",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "Glass in a fire-rated steel door may be possible only with listed glazing, label-compatible components, size limits, rating confirmation, and jurisdiction review.",
+    "tags": ["fire_rating_analysis", "rated door", "glass", "lite", "steel door"]
+  },
+  {
+    "title": "Lead Flow",
+    "source": "united_doors_ai_training_dataset.pdf",
+    "content": "The chatbot should give a helpful first answer without hard blocking, ask for state and ZIP for exact local code, and request email and phone for quotes, saved results, or detailed recommendation packages.",
+    "tags": ["lead_capture", "quote_handoff", "email", "phone", "quote"]
+  }
+]

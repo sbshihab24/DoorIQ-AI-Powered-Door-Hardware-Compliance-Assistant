@@ -1,11 +1,18 @@
 from uuid import uuid4
 
-from app.schemas.chat import ChatRequest, ChatResponse, CodeReference, RecommendedProduct
+from app.schemas.chat import (
+    ChatRequest,
+    ChatResponse,
+    CodeReference,
+    KnowledgeReference,
+    RecommendedProduct,
+)
 from app.services.code_service import find_code_references
 from app.services.guidance_service import get_guidance_for_intent
-from app.services.intent_service import detect_intent
+from app.services.intent_service import detect_intent, normalize_intent
 from app.services.lead_service import should_capture_lead
 from app.services.product_service import find_products_for_application
+from app.services.retrieval_service import find_relevant_knowledge
 
 
 def get_missing_information(request: ChatRequest) -> list[str]:
@@ -27,13 +34,22 @@ def get_missing_information(request: ChatRequest) -> list[str]:
 
 
 def get_answer_for_intent(intent: str) -> str:
+    intent = normalize_intent(intent)
+
     answers = {
-        "access_control": "Access control hardware depends on egress, fire rating, and local code limits.",
-        "accessibility": "Accessibility hardware depends on the entrance type, operator needs, and clear opening requirements.",
-        "code": "Code guidance depends on the building type, application, state, and ZIP code.",
-        "egress": "Egress door hardware depends on occupancy, exit path use, panic hardware needs, and local code.",
-        "fire_rating": "Fire-rated openings usually require compatible rated doors, frames, latching, and closing hardware.",
-        "hardware": "Hardware recommendations depend on the door application, traffic level, egress use, and rating needs.",
+        "maglock_analysis": "Maglocks and access control hardware depend on egress role, release method, fire rating, occupancy, and local code limits.",
+        "accessibility_analysis": "Accessibility guidance depends on the entrance type, accessible-route status, clear opening, maneuvering clearance, hardware operation, and operator needs.",
+        "applicable_code_lookup": "Code guidance depends on the building type, application, state, ZIP code, and adopted local amendments.",
+        "egress_analysis": "Egress door hardware depends on occupancy, occupant load, exit path use, panic hardware needs, and local code.",
+        "fire_rating_analysis": "Fire-rated openings usually require compatible labeled doors, frames, latching, and closing hardware.",
+        "hardware_allowance": "Hardware recommendations depend on door application, traffic level, egress use, access control intent, and rating needs.",
+        "door_type_recommendation": "Door recommendations depend on opening location, material, fire rating, traffic level, accessibility, and egress role.",
+        "product_match": "Product matches depend on the opening type, rating, dimensions, finish, hardware family, and project constraints.",
+        "sliding_door_analysis": "Sliding door use depends on occupancy, egress function, accessibility route status, and local code conditions.",
+        "delayed_egress_analysis": "Delayed egress depends on occupancy, security use case, fire alarm or sprinkler conditions, and AHJ approval.",
+        "automatic_operator_recommendation": "Automatic operator recommendations depend on entrance type, accessible-route requirements, user population, and power availability.",
+        "code_section_navigation": "Exact code-section links require the jurisdiction, adopted code edition, and local amendment context.",
+        "quote_handoff": "For pricing or quote handoff, the chatbot should package the project facts, selected products, jurisdiction, and contact details.",
     }
 
     return answers.get(
@@ -45,15 +61,21 @@ def get_answer_for_intent(intent: str) -> str:
 def build_chat_response(request: ChatRequest) -> ChatResponse:
     session_id = request.session_id or str(uuid4())
     intent = detect_intent(request.message)
-    guidance = get_guidance_for_intent(intent)
+    normalized_intent = normalize_intent(intent)
+    guidance = get_guidance_for_intent(normalized_intent)
     application = request.building.application if request.building else None
     state = request.location.state if request.location else None
-    products = find_products_for_application(application)
+    product_query = " ".join(
+        query_part
+        for query_part in [application, request.message, normalized_intent]
+        if query_part
+    )
+    products = find_products_for_application(product_query)
     recommended_products = [
         RecommendedProduct(
             name=product.name,
             category=product.category,
-            reason=f"Matches the application: {application}.",
+            reason=f"Matches the project context: {application or request.message}.",
         )
         for product in products
     ]
@@ -64,7 +86,15 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
             url=code_reference.url,
             summary=code_reference.content,
         )
-        for code_reference in find_code_references(intent, state)
+        for code_reference in find_code_references(normalized_intent, state)
+    ]
+    knowledge_references = [
+        KnowledgeReference(
+            title=snippet.title,
+            source=snippet.source,
+            summary=snippet.content,
+        )
+        for snippet in find_relevant_knowledge(product_query, normalized_intent)
     ]
 
     return ChatResponse(
@@ -76,6 +106,7 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
         risky_or_not_allowed=guidance.risky_or_not_allowed,
         recommended_products=recommended_products,
         code_references=code_references,
+        knowledge_references=knowledge_references,
         missing_information=get_missing_information(request),
         should_capture_lead=should_capture_lead(request),
         confidence="low",

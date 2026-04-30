@@ -23,6 +23,12 @@ class CodeReference(BaseModel):
     summary: str
 
 
+class KnowledgeReference(BaseModel):
+    title: str
+    source: str
+    summary: str
+
+
 class ChatResponse(BaseModel):
     session_id: str
     intent: str | None = None
@@ -32,6 +38,7 @@ class ChatResponse(BaseModel):
     risky_or_not_allowed: list[str] = Field(default_factory=list)
     recommended_products: list[RecommendedProduct] = Field(default_factory=list)
     code_references: list[CodeReference] = Field(default_factory=list)
+    knowledge_references: list[KnowledgeReference] = Field(default_factory=list)
     missing_information: list[str] = Field(default_factory=list)
     should_capture_lead: bool = False
     confidence: str

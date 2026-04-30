@@ -41,3 +41,22 @@ def test_chat_returns_product_recommendations_for_application() -> None:
     assert "Rim Exit Device" in product_names
     assert "Surface Door Closer" in product_names
     assert data["missing_information"] == ["building_type", "state", "zip_code"]
+
+
+def test_chat_returns_dataset_knowledge_references() -> None:
+    response = client.post(
+        "/chat",
+        json={
+            "message": "What code applies to a school entrance in my state?",
+            "building": {"application": "main entrance"},
+            "location": {"state": "TX"},
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    reference_titles = [
+        reference["title"] for reference in data["knowledge_references"]
+    ]
+    assert "Dataset Implementation Note" in reference_titles

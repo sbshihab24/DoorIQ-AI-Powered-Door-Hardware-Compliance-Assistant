@@ -1,0 +1,93 @@
+[
+  {
+    "id": "exit-device-001",
+    "name": "Rim Exit Device",
+    "category": "exit device",
+    "description": "Panic or fire exit hardware for egress doors.",
+    "compatible_applications": ["egress", "exit", "commercial door"]
+  },
+  {
+    "id": "closer-001",
+    "name": "Surface Door Closer",
+    "category": "closer",
+    "description": "Self-closing hardware for commercial doors.",
+    "compatible_applications": ["fire rated", "egress", "commercial door"]
+  },
+  {
+    "id": "accentra-2100-rim-exit-device",
+    "name": "Accentra 2100 Series Rim Exit Device",
+    "category": "exit device",
+    "description": "Grade 1 heavy-duty rim exit device for panic and fire-rated applications.",
+    "compatible_applications": ["egress", "exit", "panic hardware", "exit device", "double doors"]
+  },
+  {
+    "id": "tell-600-series-door-closer",
+    "name": "600 Series Heavy Duty Door Closer",
+    "category": "closer",
+    "description": "Grade 1 closer listed for fire-door use up to 3 hours.",
+    "compatible_applications": ["fire rated", "egress", "commercial door", "school exit", "closer"]
+  },
+  {
+    "id": "automatic-operator-placeholder",
+    "name": "Automatic Door Operator",
+    "category": "operator",
+    "description": "Automatic opening support for accessible entrances.",
+    "compatible_applications": ["accessible route", "entrance", "ada", "hospital entrance", "operator"]
+  },
+  {
+    "id": "access-control-placeholder",
+    "name": "Access Control Lock",
+    "category": "access control",
+    "description": "Electronic locking option for controlled access doors.",
+    "compatible_applications": ["secured entry", "access control", "entrance", "maglock", "electric strike"]
+  },
+  {
+    "id": "fire-rated-metal-door",
+    "name": "Fire-Rated Metal Door",
+    "category": "door",
+    "description": "Fire-rated steel door for commercial and industrial rated openings.",
+    "compatible_applications": ["commercial door", "fire rated", "egress", "stair enclosure", "rated opening"]
+  },
+  {
+    "id": "kd-masonry-frame",
+    "name": "KD Masonry Frame",
+    "category": "frame",
+    "description": "Knocked-down masonry frame for interior or exterior masonry wall openings.",
+    "compatible_applications": ["masonry opening", "masonry frame", "frame", "commercial door", "fire rated"]
+  },
+  {
+    "id": "double-egress-hollow-metal-frame",
+    "name": "Double Egress Hollow Metal Frame",
+    "category": "frame",
+    "description": "Cross-corridor frame used in hospitals, schools, and smoke-control corridors.",
+    "compatible_applications": ["double egress", "hospital corridor", "school corridor", "cross-corridor"]
+  },
+  {
+    "id": "commercial-wood-door-with-glass",
+    "name": "Commercial Wood Door with Glass",
+    "category": "door",
+    "description": "Interior wood door with lite kit and glass options, including optional 20-minute rating.",
+    "compatible_applications": ["wood door with glass", "wood door with lite", "interior", "office"]
+  },
+  {
+    "id": "metal-building-doors",
+    "name": "Metal Building Doors",
+    "category": "door",
+    "description": "Embossed insulated steel door for exterior commercial and metal building openings.",
+    "compatible_applications": ["metal building", "exterior opening", "commercial", "hospitality"]
+  },
+  {
+    "id": "h4545-ball-bearing-hinge",
+    "name": "H4545 Series Ball Bearing Hinge",
+    "category": "hinge",
+    "description": "Ball bearing hinge for heavier or higher-frequency commercial doors.",
+    "compatible_applications": ["hinge", "heavy steel door", "high frequency", "commercial door"]
+  },
+  {
+    "id": "lc1200-cortland-heavy-duty-lock",
+    "name": "LC1200 Series Cortland Heavy Duty Lock",
+    "category": "lock",
+    "description": "Grade 1 ADA-compliant cylindrical lock listed for 3-hour fire doors.",
+    "compatible_applications": ["lockset", "hospital patient room", "ada hardware", "fire rated"]
+  }
+]

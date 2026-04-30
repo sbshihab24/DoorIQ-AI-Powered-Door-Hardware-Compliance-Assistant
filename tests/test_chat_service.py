@@ -57,3 +57,46 @@ def test_build_chat_response_flags_lead_capture_for_quote_request() -> None:
     response = build_chat_response(request)
 
     assert response.should_capture_lead is True
+
+
+def test_build_chat_response_handles_dataset_product_match_case() -> None:
+    request = ChatRequest(
+        message="What door frame should I use for a masonry opening?",
+        building={"building_type": "warehouse", "application": "masonry opening frame"},
+        location={"state": "TX", "zip_code": "77002"},
+    )
+
+    response = build_chat_response(request)
+
+    product_names = [product.name for product in response.recommended_products]
+    assert response.intent == "product_match"
+    assert "KD Masonry Frame" in product_names
+    assert response.missing_information == []
+
+
+def test_build_chat_response_handles_automatic_operator_case() -> None:
+    request = ChatRequest(
+        message="Do I need an automatic operator on a hospital entrance door?",
+        building={"building_type": "hospital", "application": "hospital entrance"},
+        location={"state": "TX"},
+    )
+
+    response = build_chat_response(request)
+
+    assert response.intent == "automatic_operator_recommendation"
+    assert "Automatic Door Operator" in [
+        product.name for product in response.recommended_products
+    ]
+    assert "zip_code" in response.missing_information
+
+
+def test_build_chat_response_includes_knowledge_references() -> None:
+    request = ChatRequest(
+        message="Can I use a maglock on this egress door?",
+        building={"application": "egress door"},
+    )
+
+    response = build_chat_response(request)
+
+    titles = [reference.title for reference in response.knowledge_references]
+    assert "Maglock Seed Case" in titles

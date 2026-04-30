@@ -11,3 +11,14 @@ def test_detects_access_control_intent() -> None:
 
 def test_returns_general_when_no_keyword_matches() -> None:
     assert detect_intent("I need help choosing a door.") == "general"
+
+
+def test_detects_dataset_specific_operator_intent() -> None:
+    assert (
+        detect_intent("Do I need an automatic operator on a hospital entrance door?")
+        == "automatic_operator_recommendation"
+    )
+
+
+def test_detects_product_match_intent() -> None:
+    assert detect_intent("What door frame should I use for a masonry opening?") == "product_match"
