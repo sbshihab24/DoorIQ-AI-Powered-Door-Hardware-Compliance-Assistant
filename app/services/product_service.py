@@ -40,14 +40,45 @@ def _score_product(query: str, product: Product) -> int:
 
     for compatible_application in product.compatible_applications:
         normalized_compatible_application = compatible_application.lower()
+        compatible_application_tokens = _tokenize(normalized_compatible_application)
 
         if normalized_compatible_application in query:
             score += 5
 
-        if query in normalized_compatible_application:
-            score += 2
+        score += len(query_tokens & compatible_application_tokens)
 
     return score
+
+
+def get_product_match_reason(product: Product, query: str) -> str:
+    normalized_query = query.lower()
+
+    if product.category.lower() in normalized_query:
+        return f"Matches the requested product category: {product.category}."
+
+    for compatible_application in product.compatible_applications:
+        normalized_compatible_application = compatible_application.lower()
+
+        if normalized_compatible_application in normalized_query:
+            return f"Matches the application: {compatible_application}."
+
+    query_tokens = _tokenize(normalized_query)
+    product_tokens = _tokenize(
+        " ".join(
+            [
+                product.name,
+                product.category,
+                product.description or "",
+                " ".join(product.compatible_applications),
+            ]
+        )
+    )
+    shared_terms = sorted(query_tokens & product_tokens)
+
+    if shared_terms:
+        return f"Matches related terms: {', '.join(shared_terms[:3])}."
+
+    return "Matches the project context."
 
 
 def find_products_for_application(

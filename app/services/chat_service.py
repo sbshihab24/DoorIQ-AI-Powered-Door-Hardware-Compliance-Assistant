@@ -11,7 +11,10 @@ from app.services.code_service import find_code_references
 from app.services.guidance_service import get_guidance_for_intent
 from app.services.intent_service import detect_intent, normalize_intent
 from app.services.lead_service import should_capture_lead
-from app.services.product_service import find_products_for_application
+from app.services.product_service import (
+    find_products_for_application,
+    get_product_match_reason,
+)
 from app.services.retrieval_service import find_relevant_knowledge
 
 
@@ -58,6 +61,28 @@ def get_answer_for_intent(intent: str) -> str:
     )
 
 
+def get_response_confidence(
+    missing_information: list[str],
+    recommended_products: list[RecommendedProduct],
+    code_references: list[CodeReference],
+    knowledge_references: list[KnowledgeReference],
+) -> str:
+    if missing_information:
+        return "low"
+
+    if recommended_products and code_references and knowledge_references:
+        return "medium"
+
+    return "low"
+
+
+def should_recommend_human_review(
+    missing_information: list[str],
+    confidence: str,
+) -> bool:
+    return bool(missing_information) or confidence != "medium"
+
+
 def build_chat_response(request: ChatRequest) -> ChatResponse:
     session_id = request.session_id or str(uuid4())
     intent = detect_intent(request.message)
@@ -75,7 +100,7 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
         RecommendedProduct(
             name=product.name,
             category=product.category,
-            reason=f"Matches the project context: {application or request.message}.",
+            reason=get_product_match_reason(product, product_query),
         )
         for product in products
     ]
@@ -96,6 +121,13 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
         )
         for snippet in find_relevant_knowledge(product_query, normalized_intent)
     ]
+    missing_information = get_missing_information(request)
+    confidence = get_response_confidence(
+        missing_information=missing_information,
+        recommended_products=recommended_products,
+        code_references=code_references,
+        knowledge_references=knowledge_references,
+    )
 
     return ChatResponse(
         session_id=session_id,
@@ -107,8 +139,11 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
         recommended_products=recommended_products,
         code_references=code_references,
         knowledge_references=knowledge_references,
-        missing_information=get_missing_information(request),
+        missing_information=missing_information,
         should_capture_lead=should_capture_lead(request),
-        confidence="low",
-        human_review_recommended=True,
+        confidence=confidence,
+        human_review_recommended=should_recommend_human_review(
+            missing_information,
+            confidence,
+        ),
     )
