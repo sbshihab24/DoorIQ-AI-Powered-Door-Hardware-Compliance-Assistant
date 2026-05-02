@@ -1,0 +1,38 @@
+[
+  {
+    "stage": "low-friction first answer",
+    "trigger": "User asks first question",
+    "behavior": "Give helpful answer summary immediately; do not hard-block before any value.",
+    "crm_write": false
+  },
+  {
+    "stage": "jurisdiction precision gate",
+    "trigger": "User wants exact code or city/state answer",
+    "behavior": "Request state and ZIP before exact local-code answer.",
+    "crm_write": false
+  },
+  {
+    "stage": "lead capture soft gate",
+    "trigger": "User wants detailed recommendations, saved result, or quote",
+    "behavior": "Ask for email and phone before full detailed package or downloadable result.",
+    "crm_write": true
+  },
+  {
+    "stage": "consent / opt-in",
+    "trigger": "Before CRM write",
+    "behavior": "Store consent language and timestamp.",
+    "crm_write": true
+  },
+  {
+    "stage": "quote handoff",
+    "trigger": "User asks for price, quote, or product package",
+    "behavior": "Package transcript, selected products, jurisdiction, and contact info for sales follow-up.",
+    "crm_write": true
+  },
+  {
+    "stage": "fallback",
+    "trigger": "User refuses contact info",
+    "behavior": "Continue limited chat with generic guidance; maintain goodwill.",
+    "crm_write": false
+  }
+]

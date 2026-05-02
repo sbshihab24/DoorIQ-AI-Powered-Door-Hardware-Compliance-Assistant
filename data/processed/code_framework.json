@@ -1,0 +1,77 @@
+[
+  {
+    "source_or_code_family": "ICC Digital Codes / Codes by Location",
+    "type": "jurisdiction portal",
+    "covers": "State, county, and city code adoption and amendments.",
+    "typical_questions": [
+      "state code lookup",
+      "city amendments",
+      "adopted edition"
+    ],
+    "source_url": "https://codes.iccsafe.org/"
+  },
+  {
+    "source_or_code_family": "Model code: IBC Chapter 10 Means of Egress",
+    "type": "model code",
+    "covers": "Door swing, egress, panic hardware, locking arrangements, and exit access conditions.",
+    "typical_questions": [
+      "Do I need panic hardware?",
+      "Must the door swing out?",
+      "Can this lock on egress?"
+    ],
+    "source_url": "https://codes.iccsafe.org/content/IBC2021P2/chapter-10-means-of-egress"
+  },
+  {
+    "source_or_code_family": "ADA 2010 Standards Chapter 4 / Section 404",
+    "type": "federal accessibility standard",
+    "covers": "Accessible routes, clear width, maneuvering clearances, hardware controls, and automatic doors.",
+    "typical_questions": [
+      "Does this opening need ADA compliance?",
+      "Is an operator required?",
+      "Are revolving doors allowed?"
+    ],
+    "source_url": "https://www.access-board.gov/ada/"
+  },
+  {
+    "source_or_code_family": "ADA Guide: Chapter 4 Entrances, Doors, and Gates",
+    "type": "federal guidance",
+    "covers": "Plain-language guidance for accessible entrances and manual or automatic doors.",
+    "typical_questions": [
+      "How many entrances must be accessible?",
+      "What clearances are needed?"
+    ],
+    "source_url": "https://www.access-board.gov/ada/guides/chapter-4-entrances-doors-and-gates/"
+  },
+  {
+    "source_or_code_family": "ICC A117.1 / state accessibility code",
+    "type": "accessibility standard",
+    "covers": "Technical accessibility dimensions adopted by many states through IBC.",
+    "typical_questions": [
+      "Maneuvering clearances",
+      "thresholds",
+      "reach ranges"
+    ],
+    "source_url": "https://codes.iccsafe.org/"
+  },
+  {
+    "source_or_code_family": "ANSI/BHMA A156 family",
+    "type": "product standard",
+    "covers": "Hardware performance, grade, and operation standards.",
+    "typical_questions": [
+      "Is this product grade 1?",
+      "Which operator standard applies?"
+    ],
+    "source_url": "https://buildershardware.com/"
+  },
+  {
+    "source_or_code_family": "School / education overlay sources",
+    "type": "program-specific",
+    "covers": "Education occupancy agency, fire marshal, district, and AHJ requirements.",
+    "typical_questions": [
+      "School exit doors",
+      "classroom locks",
+      "lockdown hardware"
+    ],
+    "source_url": "https://codes.iccsafe.org/codes/united-states"
+  }
+]

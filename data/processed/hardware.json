@@ -1,0 +1,288 @@
+[
+  {
+    "id": "700-series-heavy-duty-door-closer",
+    "name": "700 Series Heavy Duty Door Closer",
+    "category": "closer",
+    "description": "Premium adjustable door closer with multiple finishes.",
+    "compatible_applications": [
+      "closer",
+      "commercial door",
+      "door closer"
+    ],
+    "source_url": null,
+    "starting_price_usd": 105,
+    "fire_rating": null
+  },
+  {
+    "id": "600-series-heavy-duty-door-closer",
+    "name": "600 Series Heavy Duty Door Closer",
+    "category": "closer",
+    "description": "Grade 1 door closer listed for fire-door use up to 3 hours.",
+    "compatible_applications": [
+      "fire rated",
+      "fire door",
+      "egress",
+      "commercial door",
+      "school exit",
+      "closer"
+    ],
+    "source_url": null,
+    "starting_price_usd": 77,
+    "fire_rating": "UL/ULC up to 3 hours"
+  },
+  {
+    "id": "800-series-heavy-duty-door-closer",
+    "name": "800 Series Heavy Duty Door Closer",
+    "category": "closer",
+    "description": "Premium grade adjustable door closer with multiple finishes.",
+    "compatible_applications": [
+      "closer",
+      "commercial door",
+      "heavy duty"
+    ],
+    "source_url": null,
+    "starting_price_usd": 116,
+    "fire_rating": null
+  },
+  {
+    "id": "900-series-heavy-duty-door-closer",
+    "name": "900 Series Heavy Duty Door Closer",
+    "category": "closer",
+    "description": "Grade 1 cast steel closer with adjustable size 1-6 and backcheck.",
+    "compatible_applications": [
+      "closer",
+      "fire rated",
+      "school exit",
+      "heavy duty",
+      "egress"
+    ],
+    "source_url": null,
+    "starting_price_usd": 169,
+    "fire_rating": "UL/ULC up to 3 hours"
+  },
+  {
+    "id": "h4545-series-plain-bearing-hinge",
+    "name": "H4545 Series Plain Bearing Hinge",
+    "category": "hinge",
+    "description": "Square-corner plain bearing hinge furnished with metal and wood screws.",
+    "compatible_applications": [
+      "hinge",
+      "plain bearing",
+      "commercial door"
+    ],
+    "source_url": null,
+    "starting_price_usd": 38,
+    "fire_rating": null
+  },
+  {
+    "id": "h4545-series-ball-bearing-hinge",
+    "name": "H4545 Series Ball Bearing Hinge",
+    "category": "hinge",
+    "description": "Ball bearing 4.5 x 4.5 hinge for heavier or higher-frequency commercial doors.",
+    "compatible_applications": [
+      "hinge",
+      "heavy steel door",
+      "high frequency",
+      "commercial door",
+      "ball bearing"
+    ],
+    "source_url": null,
+    "starting_price_usd": 42,
+    "fire_rating": null
+  },
+  {
+    "id": "tell-spring-hinge",
+    "name": "Tell Spring Hinge",
+    "category": "hinge",
+    "description": "Full mortise spring hinge with square corners.",
+    "compatible_applications": [
+      "spring hinge",
+      "self closing",
+      "commercial door",
+      "hinge"
+    ],
+    "source_url": null,
+    "starting_price_usd": 33,
+    "fire_rating": null
+  },
+  {
+    "id": "ml1300-series-cortland-heavy-duty-mortise-lock",
+    "name": "ML1300 Series Cortland Heavy Duty Mortise Lock",
+    "category": "lock",
+    "description": "Grade 1 heavy-duty mortise lock with advanced security features.",
+    "compatible_applications": [
+      "mortise lock",
+      "lockset",
+      "heavy duty",
+      "commercial"
+    ],
+    "source_url": null,
+    "starting_price_usd": 187,
+    "fire_rating": null
+  },
+  {
+    "id": "lc2600-series-cortland-standard-duty-lock",
+    "name": "LC2600 Series Cortland Standard Duty Lock",
+    "category": "lock",
+    "description": "Grade 2 cylindrical lock with Schlage C keyway and ASA strike.",
+    "compatible_applications": [
+      "cylindrical lock",
+      "lockset",
+      "commercial"
+    ],
+    "source_url": null,
+    "starting_price_usd": 62,
+    "fire_rating": null
+  },
+  {
+    "id": "lc2400-series-cortland-heavy-duty-lock",
+    "name": "LC2400 Series Cortland Heavy Duty Lock",
+    "category": "lock",
+    "description": "Grade 2 cylindrical lock with freewheeling clutch.",
+    "compatible_applications": [
+      "cylindrical lock",
+      "lockset",
+      "commercial"
+    ],
+    "source_url": null,
+    "starting_price_usd": 51,
+    "fire_rating": null
+  },
+  {
+    "id": "lc1200-series-cortland-heavy-duty-lock",
+    "name": "LC1200 Series Cortland Heavy Duty Lock",
+    "category": "lock",
+    "description": "Grade 1 ADA-compliant cylindrical lock listed for 3-hour fire doors.",
+    "compatible_applications": [
+      "lockset",
+      "hospital patient room",
+      "ada hardware",
+      "fire rated",
+      "cylindrical lock"
+    ],
+    "source_url": null,
+    "starting_price_usd": 71,
+    "fire_rating": "UL listed for 3-hour fire door"
+  },
+  {
+    "id": "kc2300-series-empire-heavy-duty-lock",
+    "name": "KC2300 Series Empire Heavy Duty Lock",
+    "category": "lock",
+    "description": "Grade 2 cylindrical lock with ASA strike and Schlage C keyway.",
+    "compatible_applications": [
+      "lockset",
+      "cylindrical lock",
+      "commercial"
+    ],
+    "source_url": null,
+    "starting_price_usd": 52,
+    "fire_rating": null
+  },
+  {
+    "id": "db2000-series-grade-2-standard-duty-deadbolt",
+    "name": "DB2000 Series Grade 2 Standard Duty Deadbolt",
+    "category": "deadbolt",
+    "description": "Grade 2 standard duty deadbolt with adjustable backset.",
+    "compatible_applications": [
+      "deadbolt",
+      "lock",
+      "commercial"
+    ],
+    "source_url": null,
+    "starting_price_usd": 37,
+    "fire_rating": null
+  },
+  {
+    "id": "db1000-series-grade-1-heavy-duty-deadbolt",
+    "name": "DB1000 Series Grade 1 Heavy Duty Deadbolt",
+    "category": "deadbolt",
+    "description": "Grade 1 heavy-duty deadbolt.",
+    "compatible_applications": [
+      "deadbolt",
+      "lock",
+      "heavy duty"
+    ],
+    "source_url": null,
+    "starting_price_usd": 147,
+    "fire_rating": null
+  },
+  {
+    "id": "accentra-2100-series-rim-exit-device",
+    "name": "Accentra 2100 Series Rim Exit Device",
+    "category": "exit device",
+    "description": "Grade 1 heavy-duty rim exit device for panic and fire-rated applications.",
+    "compatible_applications": [
+      "egress",
+      "exit",
+      "panic hardware",
+      "panic hardware for exit",
+      "exit device",
+      "double doors",
+      "fire rated"
+    ],
+    "source_url": null,
+    "starting_price_usd": 1000,
+    "fire_rating": "Optional up to 3-hour doors"
+  },
+  {
+    "id": "8300a-heavy-duty-rim-device-48-inch",
+    "name": "8300A Heavy Duty Rim Device 48 Inch",
+    "category": "exit device",
+    "description": "Grade 1 rim exit device for 28 to 36 inch doors with trim options.",
+    "compatible_applications": [
+      "egress",
+      "exit",
+      "panic hardware",
+      "exit device",
+      "double doors"
+    ],
+    "source_url": null,
+    "starting_price_usd": 151,
+    "fire_rating": "UL/ULC listed"
+  },
+  {
+    "id": "qcl140-e-626-privacy-lever-lock",
+    "name": "QCL140-E-626 Privacy Lever Lock",
+    "category": "lock",
+    "description": "Grade 1 privacy cylindrical lever lock with fire-rated latches.",
+    "compatible_applications": [
+      "privacy lock",
+      "lever lock",
+      "hospital patient room",
+      "ada hardware"
+    ],
+    "source_url": null,
+    "starting_price_usd": 259,
+    "fire_rating": "Fire-rated latches"
+  },
+  {
+    "id": "qcl130-e-626-passage-lever-set",
+    "name": "QCL130-E-626 Passage Lever Set",
+    "category": "lock",
+    "description": "Grade 1 passage cylindrical lever set with fire-rated latches.",
+    "compatible_applications": [
+      "passage lock",
+      "lever lock",
+      "commercial",
+      "ada hardware"
+    ],
+    "source_url": null,
+    "starting_price_usd": 216.5,
+    "fire_rating": "Fire-rated latches"
+  },
+  {
+    "id": "schlage-alx10-sat-saturn-grade-2-passage-lever",
+    "name": "Schlage ALX10 SAT Saturn Grade-2 Passage Lever",
+    "category": "lock",
+    "description": "Grade 2 passage lever lock listed for use on 3-hour fire doors and ADA-compliant designs.",
+    "compatible_applications": [
+      "passage lock",
+      "lever lock",
+      "ada hardware",
+      "fire rated"
+    ],
+    "source_url": null,
+    "starting_price_usd": 129.6,
+    "fire_rating": "UL listed for use on 3-hour fire doors"
+  }
+]

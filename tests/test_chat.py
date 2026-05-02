@@ -96,13 +96,12 @@ def test_chat_persists_session_and_messages(db_session: Session) -> None:
     assert chat_session.application == "egress door"
     assert chat_session.state == "TX"
     assert chat_session.zip_code == "75001"
-    assert [(message.role, message.content) for message in messages] == [
-        ("user", "What hardware do I need?"),
-        (
-            "assistant",
-            "Hardware recommendations depend on door application, traffic level, egress use, access control intent, and rating needs.",
-        ),
-    ]
+    assert messages[0].role == "user"
+    assert messages[0].content == "What hardware do I need?"
+    assert messages[1].role == "assistant"
+    assert messages[1].content == response.json()["answer"]
+    assert "Key requirements to confirm" in messages[1].content
+    assert "Relevant product matches" in messages[1].content
 
 
 def test_chat_reuses_existing_session(db_session: Session) -> None:

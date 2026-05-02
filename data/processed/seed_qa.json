@@ -1,0 +1,433 @@
+[
+  {
+    "id": "seed-001",
+    "user_question": "What doors and hardware are required for a hospital main entrance?",
+    "primary_intent": "applicable_code_lookup; door_type_recommendation; accessibility_analysis",
+    "building_type": "hospital",
+    "space_type": "main entrance",
+    "must_ask_for": [
+      "state + ZIP",
+      "new vs existing",
+      "automatic door preference"
+    ],
+    "recommended_output": "Door/entrance package + operator + panic/hardware + code links",
+    "need_email_phone": true,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-002",
+    "user_question": "What code applies to a school entrance in my state?",
+    "primary_intent": "applicable_code_lookup",
+    "building_type": "school",
+    "space_type": "main entrance",
+    "must_ask_for": [
+      "state or ZIP"
+    ],
+    "recommended_output": "Jurisdiction stack + exact source URLs",
+    "need_email_phone": true,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-003",
+    "user_question": "Can I use a magnetic lock on this type of door?",
+    "primary_intent": "maglock_analysis",
+    "building_type": "general",
+    "space_type": "egress door",
+    "must_ask_for": [
+      "jurisdiction",
+      "occupancy",
+      "fire rating",
+      "egress path"
+    ],
+    "recommended_output": "Conditional allow / not allow + alternatives",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-004",
+    "user_question": "Does this opening require handicap access?",
+    "primary_intent": "accessibility_analysis",
+    "building_type": "general",
+    "space_type": "opening",
+    "must_ask_for": [
+      "accessible route",
+      "entrance/interior",
+      "state/ZIP"
+    ],
+    "recommended_output": "Plain-language yes/no + missing data",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-005",
+    "user_question": "Do I need an automatic operator on a hospital entrance door?",
+    "primary_intent": "automatic_operator_recommendation",
+    "building_type": "hospital",
+    "space_type": "public entrance",
+    "must_ask_for": [
+      "state/ZIP",
+      "entrance count",
+      "new vs existing"
+    ],
+    "recommended_output": "Manual vs low-energy vs full-power recommendation",
+    "need_email_phone": true,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-006",
+    "user_question": "Can a school exit door have a classroom function lock?",
+    "primary_intent": "hardware_allowance; egress_analysis",
+    "building_type": "school",
+    "space_type": "exit/classroom",
+    "must_ask_for": [
+      "jurisdiction",
+      "door use",
+      "lockdown intent"
+    ],
+    "recommended_output": "Allowed hardware families + warning flags",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-007",
+    "user_question": "What fire rating does this corridor door need in a hospital?",
+    "primary_intent": "fire_rating_analysis",
+    "building_type": "hospital",
+    "space_type": "corridor opening",
+    "must_ask_for": [
+      "barrier type",
+      "smoke/fire barrier",
+      "jurisdiction"
+    ],
+    "recommended_output": "Rating path + ask for wall type if missing",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-008",
+    "user_question": "Is a sliding door allowed at a school entrance?",
+    "primary_intent": "sliding_door_analysis",
+    "building_type": "school",
+    "space_type": "main entrance",
+    "must_ask_for": [
+      "jurisdiction",
+      "accessible route",
+      "egress function"
+    ],
+    "recommended_output": "Allow / not preferred + conditions",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-009",
+    "user_question": "What kind of exit device can I use on a pair of steel doors?",
+    "primary_intent": "hardware_allowance",
+    "building_type": "general",
+    "space_type": "double doors",
+    "must_ask_for": [
+      "fire rating",
+      "occupancy",
+      "exterior/interior"
+    ],
+    "recommended_output": "Recommended device families + website matches",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-010",
+    "user_question": "Can I use delayed egress at a memory care unit?",
+    "primary_intent": "delayed_egress_analysis",
+    "building_type": "healthcare",
+    "space_type": "secured unit",
+    "must_ask_for": [
+      "jurisdiction",
+      "sprinkler/alarm status"
+    ],
+    "recommended_output": "Conditional answer + AHJ review note",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-011",
+    "user_question": "What door frame should I use for a masonry opening?",
+    "primary_intent": "product_match",
+    "building_type": "general",
+    "space_type": "frame",
+    "must_ask_for": [
+      "wall type",
+      "interior/exterior",
+      "rating"
+    ],
+    "recommended_output": "Website frame options + pros/cons",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-012",
+    "user_question": "What is the best door for a metal building opening?",
+    "primary_intent": "product_match",
+    "building_type": "general",
+    "space_type": "exterior opening",
+    "must_ask_for": [
+      "fire rating",
+      "width/height",
+      "finish"
+    ],
+    "recommended_output": "Website options + configuration notes",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-013",
+    "user_question": "Can I put glass in a fire-rated steel door?",
+    "primary_intent": "fire_rating_analysis",
+    "building_type": "general",
+    "space_type": "rated door lite",
+    "must_ask_for": [
+      "jurisdiction",
+      "rating",
+      "glass size"
+    ],
+    "recommended_output": "Yes with listed glazing/size limits if permitted",
+    "need_email_phone": false,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-014",
+    "user_question": "Does an outpatient clinic restroom door need ADA hardware?",
+    "primary_intent": "accessibility_analysis",
+    "building_type": "healthcare",
+    "space_type": "restroom",
+    "must_ask_for": [
+      "jurisdiction",
+      "new vs existing"
+    ],
+    "recommended_output": "ADA hardware and closer guidance",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-015",
+    "user_question": "What products on your site fit a 90-minute corridor pair?",
+    "primary_intent": "product_match",
+    "building_type": "general",
+    "space_type": "rated pair",
+    "must_ask_for": [
+      "door size",
+      "frame",
+      "hardware need"
+    ],
+    "recommended_output": "Matched product list",
+    "need_email_phone": true,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-016",
+    "user_question": "Can I use a maglock and a panic bar together?",
+    "primary_intent": "maglock_analysis; hardware_allowance",
+    "building_type": "general",
+    "space_type": "egress door",
+    "must_ask_for": [
+      "jurisdiction",
+      "occupancy",
+      "rating"
+    ],
+    "recommended_output": "Conditional integration answer + listed hardware note",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-017",
+    "user_question": "What code section covers door clear width?",
+    "primary_intent": "code_section_navigation",
+    "building_type": "general",
+    "space_type": "accessible route",
+    "must_ask_for": [
+      "jurisdiction or code family"
+    ],
+    "recommended_output": "Exact section + excerpt",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-018",
+    "user_question": "How many public entrances must be accessible?",
+    "primary_intent": "accessibility_analysis",
+    "building_type": "general",
+    "space_type": "entrances",
+    "must_ask_for": [
+      "new vs existing"
+    ],
+    "recommended_output": "At least 60% in new construction + caveats",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-019",
+    "user_question": "Can I use a double egress frame in a hospital corridor?",
+    "primary_intent": "door_type_recommendation",
+    "building_type": "hospital",
+    "space_type": "corridor",
+    "must_ask_for": [
+      "fire/smoke barrier info"
+    ],
+    "recommended_output": "Likely yes + smoke/egress caveats",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-020",
+    "user_question": "What hinge should I use for a heavy steel door?",
+    "primary_intent": "product_match",
+    "building_type": "general",
+    "space_type": "hinge selection",
+    "must_ask_for": [
+      "door weight",
+      "frequency",
+      "closer",
+      "exterior/interior"
+    ],
+    "recommended_output": "Recommended hinge rows from website",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-021",
+    "user_question": "What closer is best for a rated school exit door?",
+    "primary_intent": "product_match",
+    "building_type": "school",
+    "space_type": "exit door",
+    "must_ask_for": [
+      "door size",
+      "exterior/interior",
+      "rating"
+    ],
+    "recommended_output": "600 vs 900 series guidance",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-022",
+    "user_question": "Can I use a wood door on a rated stair enclosure?",
+    "primary_intent": "fire_rating_analysis",
+    "building_type": "general",
+    "space_type": "stair door",
+    "must_ask_for": [
+      "required rating",
+      "jurisdiction"
+    ],
+    "recommended_output": "Probably only within allowed rating; metal for 3 hr",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-023",
+    "user_question": "What lockset should I use for a hospital patient room?",
+    "primary_intent": "hardware_allowance; product_match",
+    "building_type": "hospital",
+    "space_type": "patient room",
+    "must_ask_for": [
+      "privacy",
+      "corridor",
+      "staff access"
+    ],
+    "recommended_output": "Lockset family + caveats",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-024",
+    "user_question": "Can a revolving door serve as the accessible entrance?",
+    "primary_intent": "accessibility_analysis",
+    "building_type": "general",
+    "space_type": "public entrance",
+    "must_ask_for": [
+      "new vs existing"
+    ],
+    "recommended_output": "No; separate compliant door required",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-025",
+    "user_question": "What information do you need before giving an exact answer?",
+    "primary_intent": "applicable_code_lookup",
+    "building_type": "general",
+    "space_type": "meta",
+    "must_ask_for": [],
+    "recommended_output": "State/ZIP, building type, space type, rated/nonrated, access control intent, new/existing",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-026",
+    "user_question": "Show me all frame options for a glass sidelite opening",
+    "primary_intent": "product_match",
+    "building_type": "general",
+    "space_type": "frame with sidelite",
+    "must_ask_for": [
+      "wall type",
+      "rating"
+    ],
+    "recommended_output": "Website frame options table",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-027",
+    "user_question": "Can I use panic hardware on a balanced door?",
+    "primary_intent": "egress_analysis",
+    "building_type": "general",
+    "space_type": "balanced door",
+    "must_ask_for": [
+      "jurisdiction",
+      "occupancy"
+    ],
+    "recommended_output": "Explain push-pad requirement when panic hardware required",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  },
+  {
+    "id": "seed-028",
+    "user_question": "Do patient room doors need latch-side clearance?",
+    "primary_intent": "accessibility_analysis",
+    "building_type": "hospital",
+    "space_type": "patient room",
+    "must_ask_for": [
+      "new vs existing"
+    ],
+    "recommended_output": "Explain special maneuvering exception",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-029",
+    "user_question": "What products fit a commercial wood door with glass?",
+    "primary_intent": "product_match",
+    "building_type": "general",
+    "space_type": "wood door with lite",
+    "must_ask_for": [
+      "rating",
+      "finish",
+      "hardware"
+    ],
+    "recommended_output": "Website product row + hardware suggestions",
+    "need_email_phone": false,
+    "escalate_to_human": false
+  },
+  {
+    "id": "seed-030",
+    "user_question": "Can I electrify this fire-rated opening?",
+    "primary_intent": "hardware_allowance; fire_rating_analysis",
+    "building_type": "general",
+    "space_type": "rated opening",
+    "must_ask_for": [
+      "device type",
+      "door/frame labels",
+      "jurisdiction"
+    ],
+    "recommended_output": "Conditional allow + listed components only",
+    "need_email_phone": true,
+    "escalate_to_human": true
+  }
+]

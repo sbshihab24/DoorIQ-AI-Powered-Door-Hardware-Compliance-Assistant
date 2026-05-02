@@ -1,0 +1,145 @@
+[
+  {
+    "intent": "applicable_code_lookup",
+    "required_entities": [
+      "state",
+      "city",
+      "ZIP",
+      "building type",
+      "new vs existing"
+    ],
+    "expected_output": "Return governing code stack and exact adoption source."
+  },
+  {
+    "intent": "door_type_recommendation",
+    "required_entities": [
+      "building type",
+      "location",
+      "interior/exterior",
+      "rating",
+      "traffic",
+      "material preference"
+    ],
+    "expected_output": "Recommend viable door families and note exclusions."
+  },
+  {
+    "intent": "hardware_allowance",
+    "required_entities": [
+      "door type",
+      "rating",
+      "occupancy",
+      "use case",
+      "access control"
+    ],
+    "expected_output": "Recommend permitted hardware families with conditions."
+  },
+  {
+    "intent": "egress_analysis",
+    "required_entities": [
+      "occupancy",
+      "occupant load",
+      "path of egress",
+      "lock type"
+    ],
+    "expected_output": "Explain swing, unlatching, panic/fire exit hardware, and exceptions."
+  },
+  {
+    "intent": "fire_rating_analysis",
+    "required_entities": [
+      "wall type",
+      "barrier type",
+      "opening location",
+      "occupancy"
+    ],
+    "expected_output": "Determine likely rating path and list missing data."
+  },
+  {
+    "intent": "accessibility_analysis",
+    "required_entities": [
+      "accessible route",
+      "entrance type",
+      "user controls",
+      "thresholds"
+    ],
+    "expected_output": "Explain ADA/A117.1 implications."
+  },
+  {
+    "intent": "maglock_analysis",
+    "required_entities": [
+      "door type",
+      "egress path",
+      "occupancy",
+      "access control intent",
+      "rating"
+    ],
+    "expected_output": "Return allow, conditionally allow, or not recommended with code path."
+  },
+  {
+    "intent": "delayed_egress_analysis",
+    "required_entities": [
+      "occupancy",
+      "patient/security use case",
+      "sprinkler/alarm status"
+    ],
+    "expected_output": "Explain when delayed egress may be permitted."
+  },
+  {
+    "intent": "sliding_door_analysis",
+    "required_entities": [
+      "location",
+      "occupancy",
+      "accessible route",
+      "egress function"
+    ],
+    "expected_output": "Assess sliding, pocket, bifold, or storefront sliders."
+  },
+  {
+    "intent": "automatic_operator_recommendation",
+    "required_entities": [
+      "entrance type",
+      "accessible route",
+      "user population",
+      "power access"
+    ],
+    "expected_output": "Recommend low-energy, full-power, or manual with rationale."
+  },
+  {
+    "intent": "product_match",
+    "required_entities": [
+      "door type",
+      "hardware type",
+      "finish",
+      "rating",
+      "brand preference"
+    ],
+    "expected_output": "Map requirement to matching website products."
+  },
+  {
+    "intent": "code_section_navigation",
+    "required_entities": [
+      "resolved jurisdiction",
+      "code family",
+      "section number"
+    ],
+    "expected_output": "Open exact code section and highlight relevant answer excerpt."
+  },
+  {
+    "intent": "lead_capture",
+    "required_entities": [
+      "conversation stage",
+      "intent value",
+      "user engagement score"
+    ],
+    "expected_output": "Collect email/phone without hard-blocking first answer."
+  },
+  {
+    "intent": "quote_handoff",
+    "required_entities": [
+      "selected products",
+      "jurisdiction",
+      "contact details",
+      "project notes"
+    ],
+    "expected_output": "Package transcript and selected products for sales follow-up."
+  }
+]

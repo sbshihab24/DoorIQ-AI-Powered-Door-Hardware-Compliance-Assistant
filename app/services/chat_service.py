@@ -10,6 +10,7 @@ from app.schemas.chat import (
     KnowledgeReference,
     RecommendedProduct,
 )
+from app.services.answer_service import build_answer
 from app.services.code_service import find_code_references
 from app.services.guidance_service import get_guidance_for_intent
 from app.services.intent_service import detect_intent, normalize_intent
@@ -19,6 +20,7 @@ from app.services.product_service import (
     get_product_match_reason,
 )
 from app.services.retrieval_service import find_relevant_knowledge
+from app.services.retrieval_service import find_relevant_knowledge_from_db
 
 
 def get_missing_information(request: ChatRequest) -> list[str]:
@@ -86,7 +88,7 @@ def should_recommend_human_review(
     return bool(missing_information) or confidence != "medium"
 
 
-def build_chat_response(request: ChatRequest) -> ChatResponse:
+def build_chat_response(request: ChatRequest, db: Session | None = None) -> ChatResponse:
     session_id = request.session_id or str(uuid4())
     intent = detect_intent(request.message)
     normalized_intent = normalize_intent(intent)
@@ -116,13 +118,22 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
         )
         for code_reference in find_code_references(normalized_intent, state)
     ]
+    if db is not None:
+        relevant_knowledge = find_relevant_knowledge_from_db(
+            db,
+            product_query,
+            normalized_intent,
+        )
+    else:
+        relevant_knowledge = find_relevant_knowledge(product_query, normalized_intent)
+
     knowledge_references = [
         KnowledgeReference(
             title=snippet.title,
             source=snippet.source,
             summary=snippet.content,
         )
-        for snippet in find_relevant_knowledge(product_query, normalized_intent)
+        for snippet in relevant_knowledge
     ]
     missing_information = get_missing_information(request)
     confidence = get_response_confidence(
@@ -135,7 +146,17 @@ def build_chat_response(request: ChatRequest) -> ChatResponse:
     return ChatResponse(
         session_id=session_id,
         intent=intent,
-        answer=get_answer_for_intent(intent),
+        answer=build_answer(
+            request=request,
+            intent=intent,
+            requirements=guidance.requirements,
+            allowed_options=guidance.allowed_options,
+            risky_or_not_allowed=guidance.risky_or_not_allowed,
+            recommended_products=recommended_products,
+            code_references=code_references,
+            knowledge_references=knowledge_references,
+            missing_information=missing_information,
+        ),
         requirements=guidance.requirements,
         allowed_options=guidance.allowed_options,
         risky_or_not_allowed=guidance.risky_or_not_allowed,
@@ -198,6 +219,6 @@ def save_chat_exchange(
 
 
 def build_and_save_chat_response(db: Session, request: ChatRequest) -> ChatResponse:
-    response = build_chat_response(request)
+    response = build_chat_response(request, db)
     save_chat_exchange(db, request, response)
     return response

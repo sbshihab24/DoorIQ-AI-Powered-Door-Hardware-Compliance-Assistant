@@ -1,5 +1,6 @@
 [
   {
+    "id": "chunk-001",
     "title": "Dataset Implementation Note",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "The training dataset is a structured starter dataset, not a replacement for official or licensed jurisdictional code text. Include this caveat for local code lookup and exact jurisdiction answers.",
@@ -11,6 +12,7 @@
     ]
   },
   {
+    "id": "chunk-002",
     "title": "ZIP-Based Local Code Resolution",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "For questions like what code applies in my ZIP, local-code precision requires resolving ZIP to city, county, and state, then checking state adoption plus city or county amendments.",
@@ -24,6 +26,7 @@
     ]
   },
   {
+    "id": "chunk-003",
     "title": "Product Recommendation Conditions",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Product recommendations should be conditioned on occupancy, egress role, fire rating, accessibility path, and local amendments.",
@@ -36,6 +39,7 @@
     ]
   },
   {
+    "id": "chunk-004",
     "title": "Hospital Main Entrance Seed Case",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "For a hospital main entrance, ask for state and ZIP, new versus existing work, and automatic-door preference; cover IBC, NFPA, ADA, accessible entrance count, likely operator, storefront or entrance options, panic hardware, and code links.",
@@ -48,6 +52,7 @@
     ]
   },
   {
+    "id": "chunk-005",
     "title": "Maglock Seed Case",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "For magnetic locks, ask for jurisdiction, occupancy, fire rating, and egress-path role; answer should cover permissibility, release method, listed components, and fallback options.",
@@ -60,6 +65,7 @@
     ]
   },
   {
+    "id": "chunk-006",
     "title": "Masonry Frame Seed Case",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "For a masonry opening, compare KD masonry frames and welded frames, and ask for wall type, interior or exterior use, and required rating.",
@@ -72,6 +78,7 @@
     ]
   },
   {
+    "id": "chunk-007",
     "title": "Fire-Rated Lite Seed Case",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Glass in a fire-rated steel door may be possible only with listed glazing, label-compatible components, size limits, rating confirmation, and jurisdiction review.",
@@ -84,6 +91,7 @@
     ]
   },
   {
+    "id": "chunk-008",
     "title": "Lead Flow",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "The chatbot should give a helpful first answer without hard blocking, ask for state and ZIP for exact local code, and request email and phone for quotes, saved results, or detailed recommendation packages.",
@@ -96,6 +104,7 @@
     ]
   },
   {
+    "id": "chunk-009",
     "title": "Seed QA: What doors and hardware are required for a hospital main entrance",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What doors and hardware are required for a hospital main entrance? Intent: applicable_code_lookup; door_type_recommendation; accessibility_analysis. Must ask for: state + ZIP, new vs existing, automatic door preference. Recommended output: Door/entrance package + operator + panic/hardware + code links.",
@@ -108,6 +117,7 @@
     ]
   },
   {
+    "id": "chunk-010",
     "title": "Seed QA: What code applies to a school entrance in my state",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What code applies to a school entrance in my state? Intent: applicable_code_lookup. Must ask for: state or ZIP. Recommended output: Jurisdiction stack + exact source URLs.",
@@ -118,6 +128,7 @@
     ]
   },
   {
+    "id": "chunk-011",
     "title": "Seed QA: Can I use a magnetic lock on this type of door",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I use a magnetic lock on this type of door? Intent: maglock_analysis. Must ask for: jurisdiction, occupancy, fire rating, egress path. Recommended output: Conditional allow / not allow + alternatives.",
@@ -128,6 +139,7 @@
     ]
   },
   {
+    "id": "chunk-012",
     "title": "Seed QA: Does this opening require handicap access",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Does this opening require handicap access? Intent: accessibility_analysis. Must ask for: accessible route, entrance/interior, state/ZIP. Recommended output: Plain-language yes/no + missing data.",
@@ -138,6 +150,7 @@
     ]
   },
   {
+    "id": "chunk-013",
     "title": "Seed QA: Do I need an automatic operator on a hospital entrance door",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Do I need an automatic operator on a hospital entrance door? Intent: automatic_operator_recommendation. Must ask for: state/ZIP, entrance count, new vs existing. Recommended output: Manual vs low-energy vs full-power recommendation.",
@@ -148,6 +161,7 @@
     ]
   },
   {
+    "id": "chunk-014",
     "title": "Seed QA: Can a school exit door have a classroom function lock",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can a school exit door have a classroom function lock? Intent: hardware_allowance; egress_analysis. Must ask for: jurisdiction, door use, lockdown intent. Recommended output: Allowed hardware families + warning flags.",
@@ -159,6 +173,7 @@
     ]
   },
   {
+    "id": "chunk-015",
     "title": "Seed QA: What fire rating does this corridor door need in a hospital",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What fire rating does this corridor door need in a hospital? Intent: fire_rating_analysis. Must ask for: barrier type, smoke/fire barrier, jurisdiction. Recommended output: Rating path + ask for wall type if missing.",
@@ -169,6 +184,7 @@
     ]
   },
   {
+    "id": "chunk-016",
     "title": "Seed QA: Is a sliding door allowed at a school entrance",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Is a sliding door allowed at a school entrance? Intent: sliding_door_analysis. Must ask for: jurisdiction, accessible route, egress function. Recommended output: Allow / not preferred + conditions.",
@@ -179,6 +195,7 @@
     ]
   },
   {
+    "id": "chunk-017",
     "title": "Seed QA: What kind of exit device can I use on a pair of steel doors",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What kind of exit device can I use on a pair of steel doors? Intent: hardware_allowance. Must ask for: fire rating, occupancy, exterior/interior. Recommended output: Recommended device families + website matches.",
@@ -189,6 +206,7 @@
     ]
   },
   {
+    "id": "chunk-018",
     "title": "Seed QA: Can I use delayed egress at a memory care unit",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I use delayed egress at a memory care unit? Intent: delayed_egress_analysis. Must ask for: jurisdiction, sprinkler/alarm status. Recommended output: Conditional answer + AHJ review note.",
@@ -199,6 +217,7 @@
     ]
   },
   {
+    "id": "chunk-019",
     "title": "Seed QA: What door frame should I use for a masonry opening",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What door frame should I use for a masonry opening? Intent: product_match. Must ask for: wall type, interior/exterior, rating. Recommended output: Website frame options + pros/cons.",
@@ -209,6 +228,7 @@
     ]
   },
   {
+    "id": "chunk-020",
     "title": "Seed QA: What is the best door for a metal building opening",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What is the best door for a metal building opening? Intent: product_match. Must ask for: fire rating, width/height, finish. Recommended output: Website options + configuration notes.",
@@ -219,6 +239,7 @@
     ]
   },
   {
+    "id": "chunk-021",
     "title": "Seed QA: Can I put glass in a fire-rated steel door",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I put glass in a fire-rated steel door? Intent: fire_rating_analysis. Must ask for: jurisdiction, rating, glass size. Recommended output: Yes with listed glazing/size limits if permitted.",
@@ -229,6 +250,7 @@
     ]
   },
   {
+    "id": "chunk-022",
     "title": "Seed QA: Does an outpatient clinic restroom door need ADA hardware",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Does an outpatient clinic restroom door need ADA hardware? Intent: accessibility_analysis. Must ask for: jurisdiction, new vs existing. Recommended output: ADA hardware and closer guidance.",
@@ -239,6 +261,7 @@
     ]
   },
   {
+    "id": "chunk-023",
     "title": "Seed QA: What products on your site fit a 90-minute corridor pair",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What products on your site fit a 90-minute corridor pair? Intent: product_match. Must ask for: door size, frame, hardware need. Recommended output: Matched product list.",
@@ -249,6 +272,7 @@
     ]
   },
   {
+    "id": "chunk-024",
     "title": "Seed QA: Can I use a maglock and a panic bar together",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I use a maglock and a panic bar together? Intent: maglock_analysis; hardware_allowance. Must ask for: jurisdiction, occupancy, rating. Recommended output: Conditional integration answer + listed hardware note.",
@@ -260,6 +284,7 @@
     ]
   },
   {
+    "id": "chunk-025",
     "title": "Seed QA: What code section covers door clear width",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What code section covers door clear width? Intent: code_section_navigation. Must ask for: jurisdiction or code family. Recommended output: Exact section + excerpt.",
@@ -270,6 +295,7 @@
     ]
   },
   {
+    "id": "chunk-026",
     "title": "Seed QA: How many public entrances must be accessible",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: How many public entrances must be accessible? Intent: accessibility_analysis. Must ask for: new vs existing. Recommended output: At least 60% in new construction + caveats.",
@@ -280,6 +306,7 @@
     ]
   },
   {
+    "id": "chunk-027",
     "title": "Seed QA: Can I use a double egress frame in a hospital corridor",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I use a double egress frame in a hospital corridor? Intent: door_type_recommendation. Must ask for: fire/smoke barrier info. Recommended output: Likely yes + smoke/egress caveats.",
@@ -290,6 +317,7 @@
     ]
   },
   {
+    "id": "chunk-028",
     "title": "Seed QA: What hinge should I use for a heavy steel door",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What hinge should I use for a heavy steel door? Intent: product_match. Must ask for: door weight, frequency, closer, exterior/interior. Recommended output: Recommended hinge rows from website.",
@@ -300,6 +328,7 @@
     ]
   },
   {
+    "id": "chunk-029",
     "title": "Seed QA: What closer is best for a rated school exit door",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What closer is best for a rated school exit door? Intent: product_match. Must ask for: door size, exterior/interior, rating. Recommended output: 600 vs 900 series guidance.",
@@ -310,6 +339,7 @@
     ]
   },
   {
+    "id": "chunk-030",
     "title": "Seed QA: Can I use a wood door on a rated stair enclosure",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I use a wood door on a rated stair enclosure? Intent: fire_rating_analysis. Must ask for: required rating, jurisdiction. Recommended output: Probably only within allowed rating; metal for 3 hr.",
@@ -320,6 +350,7 @@
     ]
   },
   {
+    "id": "chunk-031",
     "title": "Seed QA: What lockset should I use for a hospital patient room",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What lockset should I use for a hospital patient room? Intent: hardware_allowance; product_match. Must ask for: privacy, corridor, staff access. Recommended output: Lockset family + caveats.",
@@ -331,6 +362,7 @@
     ]
   },
   {
+    "id": "chunk-032",
     "title": "Seed QA: Can a revolving door serve as the accessible entrance",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can a revolving door serve as the accessible entrance? Intent: accessibility_analysis. Must ask for: new vs existing. Recommended output: No; separate compliant door required.",
@@ -341,6 +373,7 @@
     ]
   },
   {
+    "id": "chunk-033",
     "title": "Seed QA: What information do you need before giving an exact answer",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What information do you need before giving an exact answer? Intent: applicable_code_lookup. Must ask for: none. Recommended output: State/ZIP, building type, space type, rated/nonrated, access control intent, new/existing.",
@@ -351,6 +384,7 @@
     ]
   },
   {
+    "id": "chunk-034",
     "title": "Seed QA: Show me all frame options for a glass sidelite opening",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Show me all frame options for a glass sidelite opening Intent: product_match. Must ask for: wall type, rating. Recommended output: Website frame options table.",
@@ -361,6 +395,7 @@
     ]
   },
   {
+    "id": "chunk-035",
     "title": "Seed QA: Can I use panic hardware on a balanced door",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I use panic hardware on a balanced door? Intent: egress_analysis. Must ask for: jurisdiction, occupancy. Recommended output: Explain push-pad requirement when panic hardware required.",
@@ -371,6 +406,7 @@
     ]
   },
   {
+    "id": "chunk-036",
     "title": "Seed QA: Do patient room doors need latch-side clearance",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Do patient room doors need latch-side clearance? Intent: accessibility_analysis. Must ask for: new vs existing. Recommended output: Explain special maneuvering exception.",
@@ -381,6 +417,7 @@
     ]
   },
   {
+    "id": "chunk-037",
     "title": "Seed QA: What products fit a commercial wood door with glass",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: What products fit a commercial wood door with glass? Intent: product_match. Must ask for: rating, finish, hardware. Recommended output: Website product row + hardware suggestions.",
@@ -391,6 +428,7 @@
     ]
   },
   {
+    "id": "chunk-038",
     "title": "Seed QA: Can I electrify this fire-rated opening",
     "source": "united_doors_ai_training_dataset.pdf",
     "content": "Question: Can I electrify this fire-rated opening? Intent: hardware_allowance; fire_rating_analysis. Must ask for: device type, door/frame labels, jurisdiction. Recommended output: Conditional allow + listed components only.",

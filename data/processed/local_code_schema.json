@@ -1,0 +1,98 @@
+[
+  {
+    "field_name": "zip",
+    "type": "string",
+    "required": true,
+    "description": "User-entered ZIP used to resolve city/county/state and likely AHJ."
+  },
+  {
+    "field_name": "state_code",
+    "type": "string",
+    "required": true,
+    "description": "Two-letter state code."
+  },
+  {
+    "field_name": "city",
+    "type": "string",
+    "required": false,
+    "description": "Resolved city from ZIP or user entry."
+  },
+  {
+    "field_name": "county",
+    "type": "string",
+    "required": false,
+    "description": "Resolved county from ZIP or GIS."
+  },
+  {
+    "field_name": "jurisdiction_name",
+    "type": "string",
+    "required": true,
+    "description": "Display name for code answer."
+  },
+  {
+    "field_name": "adopted_building_code",
+    "type": "string",
+    "required": true,
+    "description": "Primary building code currently in force."
+  },
+  {
+    "field_name": "building_code_source_url",
+    "type": "url",
+    "required": true,
+    "description": "Official adoption/source page."
+  },
+  {
+    "field_name": "adopted_fire_code",
+    "type": "string",
+    "required": false,
+    "description": "Fire code if separate from building code."
+  },
+  {
+    "field_name": "fire_code_source_url",
+    "type": "url",
+    "required": false,
+    "description": "Official fire code source."
+  },
+  {
+    "field_name": "accessibility_code",
+    "type": "string",
+    "required": false,
+    "description": "Accessibility basis used in answer."
+  },
+  {
+    "field_name": "accessibility_source_url",
+    "type": "url",
+    "required": false,
+    "description": "Accessibility source."
+  },
+  {
+    "field_name": "effective_date",
+    "type": "date",
+    "required": true,
+    "description": "When local adoption became effective."
+  },
+  {
+    "field_name": "edition_notes",
+    "type": "string",
+    "required": false,
+    "description": "Free-text adoption nuance."
+  },
+  {
+    "field_name": "local_amendments_url",
+    "type": "url",
+    "required": false,
+    "description": "Municipal amendment page or code portal."
+  },
+  {
+    "field_name": "ahj_contact",
+    "type": "string",
+    "required": false,
+    "description": "Escalation contact if code conflict or ambiguity."
+  },
+  {
+    "field_name": "last_verified_utc",
+    "type": "datetime",
+    "required": true,
+    "description": "Freshness tracking for code lookup."
+  }
+]
