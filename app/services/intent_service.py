@@ -1,3 +1,6 @@
+from app.services.seed_qa_service import find_seed_qa_for_question, get_primary_seed_intent
+
+
 INTENT_KEYWORDS = {
     "maglock_analysis": [
         "maglock",
@@ -104,6 +107,11 @@ LEGACY_INTENTS = {value: key for key, value in INTENT_ALIASES.items()}
 
 
 def detect_intent(message: str) -> str:
+    seed_qa = find_seed_qa_for_question(message)
+    if seed_qa is not None:
+        seed_intent = get_primary_seed_intent(seed_qa)
+        return LEGACY_INTENTS.get(seed_intent, seed_intent)
+
     normalized_message = message.lower()
 
     for intent, keywords in INTENT_KEYWORDS.items():

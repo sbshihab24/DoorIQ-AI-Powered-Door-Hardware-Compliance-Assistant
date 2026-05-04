@@ -28,6 +28,7 @@ from app.services.product_service import (
 )
 from app.services.retrieval_service import find_relevant_knowledge
 from app.services.retrieval_service import find_relevant_knowledge_from_db
+from app.services.seed_qa_service import find_seed_qa_for_question
 
 
 def get_missing_information(request: ChatRequest, intent: str = "general") -> list[str]:
@@ -75,9 +76,14 @@ def get_response_confidence(
 
 
 def should_recommend_human_review(
+    request: ChatRequest,
     missing_information: list[str],
     confidence: str,
 ) -> bool:
+    seed_qa = find_seed_qa_for_question(request.message)
+    if seed_qa is not None:
+        return bool(seed_qa.get("escalate_to_human"))
+
     return bool(missing_information) or confidence != "medium"
 
 
@@ -163,6 +169,7 @@ def build_chat_response(request: ChatRequest, db: Session | None = None) -> Chat
         ),
         confidence=confidence,
         human_review_recommended=should_recommend_human_review(
+            request,
             missing_information,
             confidence,
         ),

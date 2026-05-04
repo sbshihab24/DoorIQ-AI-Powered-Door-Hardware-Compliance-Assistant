@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.db.models import ChatSession, Lead
 from app.schemas.chat import ChatRequest
 from app.schemas.chat import LeadCaptureStatus
+from app.services.seed_qa_service import find_seed_qa_for_question
 
 
 LEAD_CAPTURE_KEYWORDS = [
@@ -19,6 +20,10 @@ LEAD_CAPTURE_KEYWORDS = [
 
 
 def should_capture_lead(request: ChatRequest) -> bool:
+    seed_qa = find_seed_qa_for_question(request.message)
+    if seed_qa is not None:
+        return bool(seed_qa.get("need_email_phone"))
+
     normalized_message = request.message.lower()
 
     if any(keyword in normalized_message for keyword in LEAD_CAPTURE_KEYWORDS):

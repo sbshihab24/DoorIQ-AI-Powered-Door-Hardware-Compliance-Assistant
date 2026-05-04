@@ -135,4 +135,4 @@ def test_build_chat_response_uses_medium_confidence_for_complete_context() -> No
     response = build_chat_response(request)
 
     assert response.confidence == "low"
-    assert response.human_review_recommended is True
+    assert response.human_review_recommended is False
