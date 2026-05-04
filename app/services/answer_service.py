@@ -7,6 +7,7 @@ from app.schemas.chat import (
     RecommendedProduct,
 )
 from app.services.intent_service import normalize_intent
+from app.services.llm_service import generate_llm_answer
 from app.services.seed_qa_service import find_seed_qa_for_question
 
 
@@ -109,6 +110,49 @@ def _seed_output_summary(request: ChatRequest) -> str:
     return ""
 
 
+def _llm_context(
+    request: ChatRequest,
+    intent: str,
+    template_answer: str,
+    requirements: list[str],
+    allowed_options: list[str],
+    risky_or_not_allowed: list[str],
+    recommended_products: list[RecommendedProduct],
+    code_references: list[CodeReference],
+    knowledge_references: list[KnowledgeReference],
+    missing_information: list[str],
+) -> dict:
+    seed_qa = find_seed_qa_for_question(request.message)
+    return {
+        "user_question": request.message,
+        "intent": normalize_intent(intent),
+        "template_answer": template_answer,
+        "seed_recommended_output": seed_qa.get("recommended_output") if seed_qa else None,
+        "requirements": requirements,
+        "allowed_options": allowed_options,
+        "risky_or_not_allowed": risky_or_not_allowed,
+        "recommended_products": [
+            product.model_dump()
+            for product in recommended_products[:5]
+        ],
+        "code_references": [
+            reference.model_dump()
+            for reference in code_references[:3]
+        ],
+        "knowledge_references": [
+            reference.model_dump()
+            for reference in knowledge_references[:3]
+        ],
+        "missing_information": missing_information,
+        "rules": [
+            "Use only the supplied context.",
+            "Do not claim final local code certainty without jurisdiction verification.",
+            "Ask for missing details rather than guessing.",
+            "Keep any product recommendation conditional on rating, egress, accessibility, and local amendments.",
+        ],
+    }
+
+
 def build_answer(
     request: ChatRequest,
     intent: str,
@@ -156,4 +200,19 @@ def build_answer(
             "Treat this as guidance from the starter dataset until the adopted local code and amendments are verified."
         )
 
-    return " ".join(part for part in answer_parts if part)
+    template_answer = " ".join(part for part in answer_parts if part)
+    return generate_llm_answer(
+        context=_llm_context(
+            request=request,
+            intent=intent,
+            template_answer=template_answer,
+            requirements=requirements,
+            allowed_options=allowed_options,
+            risky_or_not_allowed=risky_or_not_allowed,
+            recommended_products=recommended_products,
+            code_references=code_references,
+            knowledge_references=knowledge_references,
+            missing_information=missing_information,
+        ),
+        fallback_answer=template_answer,
+    )

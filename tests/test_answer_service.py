@@ -66,3 +66,32 @@ def test_build_answer_keeps_local_code_caveat() -> None:
     assert "Exact code guidance needs jurisdiction context" in answer
     assert "starter dataset" in answer
     assert "state, zip code" in answer
+
+
+def test_build_answer_can_use_llm_writer(monkeypatch) -> None:
+    captured_context = {}
+
+    def fake_generate_llm_answer(*, context, fallback_answer):
+        captured_context.update(context)
+        return f"LLM: {fallback_answer}"
+
+    monkeypatch.setattr(
+        "app.services.answer_service.generate_llm_answer",
+        fake_generate_llm_answer,
+    )
+
+    answer = build_answer(
+        request=ChatRequest(message="Can I use a maglock?"),
+        intent="maglock_analysis",
+        requirements=["Confirm egress role."],
+        allowed_options=["Use listed access control hardware where allowed."],
+        risky_or_not_allowed=[],
+        recommended_products=[],
+        code_references=[],
+        knowledge_references=[],
+        missing_information=["jurisdiction"],
+    )
+
+    assert answer.startswith("LLM: Maglocks are conditional")
+    assert captured_context["intent"] == "maglock_analysis"
+    assert captured_context["missing_information"] == ["jurisdiction"]

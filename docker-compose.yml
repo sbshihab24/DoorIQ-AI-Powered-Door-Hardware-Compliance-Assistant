@@ -24,7 +24,10 @@ services:
       APP_ENV: development
       DATABASE_URL: postgresql+psycopg://dooriq:dooriq_password@db:5432/dooriq
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4.1-mini}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_CHAT_MODEL: ${GROQ_CHAT_MODEL:-llama-3.3-70b-versatile}
       LOCAL_EMBEDDING_DIMENSIONS: ${LOCAL_EMBEDDING_DIMENSIONS:-128}
     ports:
       - "8766:8000"
@@ -42,7 +45,10 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://dooriq:dooriq_password@db:5432/dooriq
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4.1-mini}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_CHAT_MODEL: ${GROQ_CHAT_MODEL:-llama-3.3-70b-versatile}
       LOCAL_EMBEDDING_DIMENSIONS: ${LOCAL_EMBEDDING_DIMENSIONS:-128}
     command: >
       sh -c "alembic upgrade head &&

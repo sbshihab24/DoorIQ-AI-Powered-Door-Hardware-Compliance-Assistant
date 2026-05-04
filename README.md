@@ -37,6 +37,31 @@ http://127.0.0.1:8766/
 
 The database is exposed on host port `5433` and container port `5432`.
 
+## LLM Providers
+
+The chatbot uses the current structured rule/retrieval pipeline first, then optionally asks an LLM to write the final answer.
+
+Provider order:
+
+1. OpenAI when `OPENAI_API_KEY` is set.
+2. Groq when `GROQ_API_KEY` is set and OpenAI is not set.
+3. Template fallback when neither key is set or the LLM call fails.
+
+Example `.env` values:
+
+```text
+OPENAI_API_KEY=
+OPENAI_CHAT_MODEL=gpt-4.1-mini
+GROQ_API_KEY=
+GROQ_CHAT_MODEL=llama-3.3-70b-versatile
+```
+
+Groq is used through its OpenAI-compatible API at:
+
+```text
+https://api.groq.com/openai/v1
+```
+
 ## Ingest Dataset
 
 The processed dataset is generated from:
