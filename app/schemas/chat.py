@@ -29,6 +29,12 @@ class KnowledgeReference(BaseModel):
     summary: str
 
 
+class LeadCaptureStatus(BaseModel):
+    email_collected: bool = False
+    phone_collected: bool = False
+    lead_created: bool = False
+
+
 class ChatResponse(BaseModel):
     session_id: str
     intent: str | None = None
@@ -41,5 +47,6 @@ class ChatResponse(BaseModel):
     knowledge_references: list[KnowledgeReference] = Field(default_factory=list)
     missing_information: list[str] = Field(default_factory=list)
     should_capture_lead: bool = False
+    lead_capture_status: LeadCaptureStatus = Field(default_factory=LeadCaptureStatus)
     confidence: str
     human_review_recommended: bool = False

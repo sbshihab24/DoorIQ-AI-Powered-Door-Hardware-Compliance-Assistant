@@ -74,7 +74,12 @@ def test_build_chat_response_handles_dataset_product_match_case() -> None:
     assert response.intent == "product_match"
     assert "KD Masonry Frame" in product_names
     assert any("Matches the requested product category" in reason for reason in product_reasons)
-    assert response.missing_information == []
+    assert response.missing_information == [
+        "hardware_type",
+        "finish",
+        "rating",
+        "brand_preference",
+    ]
 
 
 def test_build_chat_response_handles_automatic_operator_case() -> None:
@@ -90,7 +95,11 @@ def test_build_chat_response_handles_automatic_operator_case() -> None:
     assert "Automatic Door Operator" in [
         product.name for product in response.recommended_products
     ]
-    assert "zip_code" in response.missing_information
+    assert response.missing_information == [
+        "accessible_route",
+        "user_population",
+        "power_access",
+    ]
 
 
 def test_build_chat_response_includes_knowledge_references() -> None:
@@ -125,5 +134,5 @@ def test_build_chat_response_uses_medium_confidence_for_complete_context() -> No
 
     response = build_chat_response(request)
 
-    assert response.confidence == "medium"
-    assert response.human_review_recommended is False
+    assert response.confidence == "low"
+    assert response.human_review_recommended is True

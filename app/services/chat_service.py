@@ -12,9 +12,16 @@ from app.schemas.chat import (
 )
 from app.services.answer_service import build_answer
 from app.services.code_service import find_code_references
+from app.services.conversation_context_service import merge_conversation_context
 from app.services.guidance_service import get_guidance_for_intent
 from app.services.intent_service import detect_intent, normalize_intent
-from app.services.lead_service import should_capture_lead
+from app.services.lead_service import (
+    apply_contact_details_to_session,
+    create_lead_from_session_if_ready,
+    get_lead_capture_status,
+    should_capture_lead,
+)
+from app.services.missing_information_service import get_missing_information_for_intent
 from app.services.product_service import (
     find_products_for_application,
     get_product_match_reason,
@@ -23,22 +30,8 @@ from app.services.retrieval_service import find_relevant_knowledge
 from app.services.retrieval_service import find_relevant_knowledge_from_db
 
 
-def get_missing_information(request: ChatRequest) -> list[str]:
-    missing_information = []
-
-    if not request.building or not request.building.building_type:
-        missing_information.append("building_type")
-
-    if not request.building or not request.building.application:
-        missing_information.append("application")
-
-    if not request.location or not request.location.state:
-        missing_information.append("state")
-
-    if not request.location or not request.location.zip_code:
-        missing_information.append("zip_code")
-
-    return missing_information
+def get_missing_information(request: ChatRequest, intent: str = "general") -> list[str]:
+    return get_missing_information_for_intent(request, intent)
 
 
 def get_answer_for_intent(intent: str) -> str:
@@ -135,7 +128,7 @@ def build_chat_response(request: ChatRequest, db: Session | None = None) -> Chat
         )
         for snippet in relevant_knowledge
     ]
-    missing_information = get_missing_information(request)
+    missing_information = get_missing_information(request, normalized_intent)
     confidence = get_response_confidence(
         missing_information=missing_information,
         recommended_products=recommended_products,
@@ -165,6 +158,9 @@ def build_chat_response(request: ChatRequest, db: Session | None = None) -> Chat
         knowledge_references=knowledge_references,
         missing_information=missing_information,
         should_capture_lead=should_capture_lead(request),
+        lead_capture_status=get_lead_capture_status(
+            db.get(ChatSession, session_id) if db is not None else None
+        ),
         confidence=confidence,
         human_review_recommended=should_recommend_human_review(
             missing_information,
@@ -191,6 +187,18 @@ def get_or_create_chat_session(db: Session, request: ChatRequest, session_id: st
             chat_session.state = request.location.state
         if request.location.zip_code is not None:
             chat_session.zip_code = request.location.zip_code
+        if request.location.city is not None:
+            chat_session.city = request.location.city
+
+    if request.building:
+        if request.building.is_new_construction is not None:
+            chat_session.is_new_construction = request.building.is_new_construction
+        if request.building.is_egress_path is not None:
+            chat_session.is_egress_path = request.building.is_egress_path
+        if request.building.fire_rating_required is not None:
+            chat_session.fire_rating_required = request.building.fire_rating_required
+        if request.building.accessibility_required is not None:
+            chat_session.accessibility_required = request.building.accessibility_required
 
     return chat_session
 
@@ -199,8 +207,27 @@ def save_chat_exchange(
     db: Session,
     request: ChatRequest,
     response: ChatResponse,
+    context_request: ChatRequest | None = None,
 ) -> None:
-    get_or_create_chat_session(db, request, response.session_id)
+    chat_session = get_or_create_chat_session(
+        db,
+        context_request or request,
+        response.session_id,
+    )
+    apply_contact_details_to_session(chat_session, request.message)
+    lead_created = False
+    if should_capture_lead(context_request or request):
+        lead_created = create_lead_from_session_if_ready(
+            db,
+            chat_session,
+            project_notes=request.message,
+        )
+
+    response.lead_capture_status.email_collected = bool(chat_session.email)
+    response.lead_capture_status.phone_collected = bool(chat_session.phone)
+    response.lead_capture_status.lead_created = (
+        response.lead_capture_status.lead_created or lead_created
+    )
     db.add_all(
         [
             ChatMessage(
@@ -219,6 +246,7 @@ def save_chat_exchange(
 
 
 def build_and_save_chat_response(db: Session, request: ChatRequest) -> ChatResponse:
-    response = build_chat_response(request, db)
-    save_chat_exchange(db, request, response)
+    context_request = merge_conversation_context(db, request)
+    response = build_chat_response(context_request, db)
+    save_chat_exchange(db, request, response, context_request)
     return response

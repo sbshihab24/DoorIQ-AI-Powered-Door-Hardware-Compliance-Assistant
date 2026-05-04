@@ -14,6 +14,11 @@ class ChatSession(Base):
     application: Mapped[str | None] = mapped_column(nullable=True)
     state: Mapped[str | None] = mapped_column(nullable=True)
     zip_code: Mapped[str | None] = mapped_column(nullable=True)
+    city: Mapped[str | None] = mapped_column(nullable=True)
+    is_new_construction: Mapped[bool | None] = mapped_column(nullable=True)
+    is_egress_path: Mapped[bool | None] = mapped_column(nullable=True)
+    fire_rating_required: Mapped[bool | None] = mapped_column(nullable=True)
+    accessibility_required: Mapped[bool | None] = mapped_column(nullable=True)
     email: Mapped[str | None] = mapped_column(nullable=True)
     phone: Mapped[str | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(

@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.db.models import ChatMessage, ChatSession
+from app.db.models import ChatMessage, ChatSession, Lead
 from app.main import app
 
 
@@ -20,10 +20,10 @@ def test_chat_returns_placeholder_response() -> None:
     assert data["confidence"] == "low"
     assert data["human_review_recommended"] is True
     assert data["missing_information"] == [
-        "building_type",
-        "application",
-        "state",
-        "zip_code",
+        "occupancy",
+        "occupant_load",
+        "path_of_egress",
+        "lock_type",
     ]
 
 
@@ -42,7 +42,12 @@ def test_chat_returns_product_recommendations_for_application() -> None:
     product_names = [product["name"] for product in data["recommended_products"]]
     assert "Rim Exit Device" in product_names
     assert "Surface Door Closer" in product_names
-    assert data["missing_information"] == ["building_type", "state", "zip_code"]
+    assert data["missing_information"] == [
+        "rating",
+        "occupancy",
+        "use_case",
+        "access_control",
+    ]
 
 
 def test_chat_returns_dataset_knowledge_references() -> None:
@@ -132,3 +137,72 @@ def test_chat_reuses_existing_session(db_session: Session) -> None:
         "user",
         "assistant",
     ]
+
+
+def test_chat_uses_follow_up_context_to_reduce_missing_information(
+    db_session: Session,
+) -> None:
+    first_response = client.post(
+        "/chat",
+        json={"message": "Can I use a maglock on this egress door?"},
+    )
+    session_id = first_response.json()["session_id"]
+
+    second_response = client.post(
+        "/chat",
+        json={
+            "session_id": session_id,
+            "message": "It is a fire-rated hospital corridor in Texas ZIP 77002.",
+        },
+    )
+
+    assert second_response.status_code == 200
+    data = second_response.json()
+    assert data["session_id"] == session_id
+    assert data["intent"] == "access_control"
+    assert data["missing_information"] == []
+
+    chat_session = db_session.get(ChatSession, session_id)
+    assert chat_session is not None
+    assert chat_session.building_type == "hospital"
+    assert chat_session.application == "hospital corridor"
+    assert chat_session.state == "TX"
+    assert chat_session.zip_code == "77002"
+    assert chat_session.fire_rating_required is True
+    assert chat_session.is_egress_path is True
+
+
+def test_chat_captures_contact_details_and_creates_lead(
+    db_session: Session,
+) -> None:
+    first_response = client.post(
+        "/chat",
+        json={"message": "Can I get a quote for this egress hardware?"},
+    )
+    session_id = first_response.json()["session_id"]
+
+    second_response = client.post(
+        "/chat",
+        json={
+            "session_id": session_id,
+            "message": "My email is brian@example.com and phone is 555-123-4567.",
+        },
+    )
+
+    assert second_response.status_code == 200
+    data = second_response.json()
+    assert data["lead_capture_status"] == {
+        "email_collected": True,
+        "phone_collected": True,
+        "lead_created": True,
+    }
+
+    chat_session = db_session.get(ChatSession, session_id)
+    leads = db_session.query(Lead).filter(Lead.session_id == session_id).all()
+
+    assert chat_session is not None
+    assert chat_session.email == "brian@example.com"
+    assert chat_session.phone == "555-123-4567"
+    assert len(leads) == 1
+    assert leads[0].email == "brian@example.com"
+    assert leads[0].phone == "555-123-4567"
