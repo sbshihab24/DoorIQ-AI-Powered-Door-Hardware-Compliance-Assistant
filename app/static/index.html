@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DoorIQ Chatbot</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <aside class="sidebar">
+          <div>
+            <p class="eyebrow">United Doors & Hardware</p>
+            <h1>DoorIQ</h1>
+            <p class="subhead">Commercial door, frame, hardware, and code guidance.</p>
+          </div>
+
+          <div class="status-grid">
+            <div>
+              <span>Session</span>
+              <strong id="sessionId">New</strong>
+            </div>
+            <div>
+              <span>Confidence</span>
+              <strong id="confidence">-</strong>
+            </div>
+            <div>
+              <span>Lead</span>
+              <strong id="leadState">Not needed</strong>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="buildingType">Building Type</label>
+            <select id="buildingType">
+              <option value="">Unknown</option>
+              <option>hospital</option>
+              <option>school</option>
+              <option>healthcare</option>
+              <option>office</option>
+              <option>warehouse</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="application">Application</label>
+            <input id="application" placeholder="main entrance, corridor, egress door" />
+          </div>
+
+          <div class="two-col">
+            <div class="field-group">
+              <label for="state">State</label>
+              <input id="state" placeholder="TX" maxlength="2" />
+            </div>
+            <div class="field-group">
+              <label for="zipCode">ZIP</label>
+              <input id="zipCode" placeholder="77002" />
+            </div>
+          </div>
+
+          <div class="toggles">
+            <label><input id="egressPath" type="checkbox" /> Egress path</label>
+            <label><input id="ratedOpening" type="checkbox" /> Rated opening</label>
+            <label><input id="accessibleRoute" type="checkbox" /> Accessible route</label>
+          </div>
+        </aside>
+
+        <section class="chat-panel">
+          <div class="topbar">
+            <div>
+              <h2>Chat Test</h2>
+              <p>Ask a DoorIQ demo question or type your own project scenario.</p>
+            </div>
+            <button id="resetButton" class="ghost-button" type="button">Reset</button>
+          </div>
+
+          <div id="quickPrompts" class="quick-prompts"></div>
+
+          <div id="messages" class="messages">
+            <article class="message assistant">
+              <p>Ask about door types, hardware, ADA, fire ratings, maglocks, operators, egress, or product matches.</p>
+            </article>
+          </div>
+
+          <form id="chatForm" class="composer">
+            <textarea id="messageInput" rows="2" placeholder="Can I use a maglock and a panic bar together?"></textarea>
+            <button id="sendButton" type="submit">Send</button>
+          </form>
+        </section>
+
+        <aside class="details-panel">
+          <section>
+            <p class="eyebrow">Response</p>
+            <h2 id="intent">Intent</h2>
+            <div id="flags" class="flags"></div>
+          </section>
+
+          <section>
+            <h3>Missing Info</h3>
+            <div id="missingInfo" class="pill-list"></div>
+          </section>
+
+          <section>
+            <h3>Products</h3>
+            <div id="products" class="stack"></div>
+          </section>
+
+          <section>
+            <h3>Sources</h3>
+            <div id="sources" class="stack"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

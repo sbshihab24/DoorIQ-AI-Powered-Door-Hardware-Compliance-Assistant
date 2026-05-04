@@ -12,7 +12,8 @@ def test_ingest_knowledge_chunks_upserts_generated_chunks(db_session: Session) -
 
     assert count == 38
     assert len(chunks) == 38
-    assert chunks[0].embedding
+    assert chunks[0].embedding is not None
+    assert len(chunks[0].embedding) > 0
     assert chunks[0].embedding_model.startswith("local-hash-")
 
 

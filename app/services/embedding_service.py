@@ -47,7 +47,7 @@ def embed_text(text: str) -> list[float]:
 
 
 def cosine_similarity(left: list[float] | None, right: list[float] | None) -> float:
-    if not left or not right or len(left) != len(right):
+    if left is None or right is None or len(left) == 0 or len(right) == 0 or len(left) != len(right):
         return 0.0
 
     left_magnitude = math.sqrt(sum(value * value for value in left))

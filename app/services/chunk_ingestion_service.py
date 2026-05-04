@@ -38,6 +38,10 @@ def _metadata_for_chunk(chunk_data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _has_embedding(embedding: Any) -> bool:
+    return embedding is not None and len(embedding) > 0
+
+
 def upsert_document_chunk(db: Session, chunk_data: dict[str, Any]) -> DocumentChunk:
     content = str(chunk_data.get("content", "")).strip()
     if not content:
@@ -52,7 +56,7 @@ def upsert_document_chunk(db: Session, chunk_data: dict[str, Any]) -> DocumentCh
         existing_chunk is None
         or existing_chunk.content_hash != content_hash
         or existing_chunk.embedding_model != embedding_model
-        or not existing_chunk.embedding
+        or not _has_embedding(existing_chunk.embedding)
     )
     embedding = (
         embed_text(content)

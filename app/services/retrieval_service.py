@@ -83,6 +83,26 @@ def find_relevant_knowledge_from_db(
     limit: int = 3,
 ) -> list[KnowledgeSnippet]:
     query_embedding = embed_text(" ".join(part for part in [query, intent or ""] if part))
+    if db.bind is not None and db.bind.dialect.name == "postgresql":
+        chunks = (
+            db.query(DocumentChunk)
+            .filter(DocumentChunk.embedding.isnot(None))
+            .order_by(DocumentChunk.embedding.cosine_distance(query_embedding))
+            .limit(limit)
+            .all()
+        )
+        if chunks:
+            snippets = [
+                KnowledgeSnippet(
+                    title=chunk.title,
+                    source=chunk.source,
+                    content=chunk.content,
+                    tags=list(chunk.tags or []),
+                )
+                for chunk in chunks
+            ]
+            return _with_applicable_code_pins(snippets, limit, intent)
+
     chunks = db.query(DocumentChunk).all()
     scored_chunks: list[tuple[float, DocumentChunk]] = []
 
@@ -108,17 +128,25 @@ def find_relevant_knowledge_from_db(
         for _, chunk in scored_chunks[:limit]
     ]
 
-    if intent == "applicable_code_lookup":
-        pinned_titles = {
-            "Dataset Implementation Note",
-            "ZIP-Based Local Code Resolution",
-        }
-        existing_titles = {snippet.title for snippet in snippets}
-        fallback_pins = [
-            snippet
-            for snippet in get_knowledge_base()
-            if snippet.title in pinned_titles and snippet.title not in existing_titles
-        ]
-        snippets = fallback_pins + snippets
+    return _with_applicable_code_pins(snippets, limit, intent)
 
-    return snippets[:limit]
+
+def _with_applicable_code_pins(
+    snippets: list[KnowledgeSnippet],
+    limit: int,
+    intent: str | None = None,
+) -> list[KnowledgeSnippet]:
+    if intent != "applicable_code_lookup":
+        return snippets[:limit]
+
+    pinned_titles = {
+        "Dataset Implementation Note",
+        "ZIP-Based Local Code Resolution",
+    }
+    existing_titles = {snippet.title for snippet in snippets}
+    fallback_pins = [
+        snippet
+        for snippet in get_knowledge_base()
+        if snippet.title in pinned_titles and snippet.title not in existing_titles
+    ]
+    return (fallback_pins + snippets)[:limit]

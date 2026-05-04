@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, JSON, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from pgvector.sqlalchemy import Vector
 
 from app.db.session import Base
 
@@ -89,7 +90,7 @@ class DocumentChunk(Base):
     tags: Mapped[list[str]] = mapped_column(JSON, default=list)
     chunk_metadata: Mapped[dict] = mapped_column(JSON, default=dict)
     content_hash: Mapped[str] = mapped_column(index=True)
-    embedding: Mapped[list[float] | None] = mapped_column(JSON, nullable=True)
+    embedding: Mapped[list[float] | None] = mapped_column(Vector(), nullable=True)
     embedding_model: Mapped[str | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

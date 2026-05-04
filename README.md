@@ -1,0 +1,89 @@
+# DoorIQ Chatbot
+
+Backend chatbot API and test frontend for United Doors & Hardware door, frame, hardware, product, and code-guidance questions.
+
+## Local Python
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+```
+
+Run the API against the Docker pgvector database:
+
+```powershell
+$env:DATABASE_URL="postgresql+psycopg://dooriq:dooriq_password@localhost:5433/dooriq"
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8765
+```
+
+Open:
+
+```text
+http://127.0.0.1:8765/
+```
+
+## Docker + pgvector
+
+Start the app and pgvector database:
+
+```powershell
+docker compose up --build app
+```
+
+Open:
+
+```text
+http://127.0.0.1:8766/
+```
+
+The database is exposed on host port `5433` and container port `5432`.
+
+## Ingest Dataset
+
+The processed dataset is generated from:
+
+```text
+C:\bryan\united_doors_ai_training_dataset.pdf
+```
+
+Regenerate processed JSON and ingest vector chunks into Postgres:
+
+```powershell
+docker compose --profile ingest run --rm ingest
+```
+
+This runs:
+
+```text
+alembic upgrade head
+python scripts/ingest_dataset.py
+python scripts/ingest_chunks.py
+```
+
+Expected result:
+
+```text
+Ingested 38 document chunks.
+```
+
+## Useful Checks
+
+Verify pgvector is enabled:
+
+```powershell
+docker compose exec db psql -U dooriq -d dooriq -c "SELECT extname FROM pg_extension WHERE extname = 'vector';"
+```
+
+Verify chunks are stored as vectors:
+
+```powershell
+docker compose exec db psql -U dooriq -d dooriq -c "SELECT count(*) AS document_chunks, pg_typeof(embedding) AS embedding_type FROM document_chunks GROUP BY pg_typeof(embedding);"
+```
+
+## Demo Questions
+
+- What code applies to a school entrance in my state?
+- Can I use a maglock and a panic bar together?
+- What products on your site fit a 90-minute corridor pair?
+- Do I need an automatic operator on a hospital entrance door?
+- Can I electrify this fire-rated opening?
+- What information do you need before giving an exact answer?

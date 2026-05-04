@@ -1,0 +1,16 @@
+.git/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+htmlcov/
+.coverage
+*.sqlite
+*.sqlite3
+*.db
+*.log
+united-doors-chatbot-reference.pdf
