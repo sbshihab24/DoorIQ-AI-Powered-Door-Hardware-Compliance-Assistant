@@ -41,6 +41,7 @@ def test_llm_returns_template_when_no_provider_key(monkeypatch) -> None:
 
 def test_llm_uses_openai_before_groq(monkeypatch) -> None:
     FakeOpenAI.instances = []
+    monkeypatch.setenv("DOORIQ_ALLOW_LLM_DURING_TESTS", "1")
     monkeypatch.setattr(llm_service, "OpenAI", FakeOpenAI)
     monkeypatch.setattr(settings, "openai_api_key", "openai-key")
     monkeypatch.setattr(settings, "groq_api_key", "groq-key")
@@ -59,6 +60,7 @@ def test_llm_uses_openai_before_groq(monkeypatch) -> None:
 
 def test_llm_uses_groq_when_openai_key_is_missing(monkeypatch) -> None:
     FakeOpenAI.instances = []
+    monkeypatch.setenv("DOORIQ_ALLOW_LLM_DURING_TESTS", "1")
     monkeypatch.setattr(llm_service, "OpenAI", FakeOpenAI)
     monkeypatch.setattr(settings, "openai_api_key", None)
     monkeypatch.setattr(settings, "groq_api_key", "groq-key")
@@ -88,6 +90,7 @@ def test_llm_falls_back_when_provider_call_fails(monkeypatch) -> None:
             )
 
     monkeypatch.setattr(llm_service, "OpenAI", FailingOpenAI)
+    monkeypatch.setenv("DOORIQ_ALLOW_LLM_DURING_TESTS", "1")
     monkeypatch.setattr(settings, "openai_api_key", "openai-key")
     monkeypatch.setattr(settings, "groq_api_key", None)
 

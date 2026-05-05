@@ -87,9 +87,54 @@ def should_recommend_human_review(
     return bool(missing_information) or confidence != "medium"
 
 
+def _build_special_chat_response(
+    request: ChatRequest,
+    session_id: str,
+    intent: str,
+    db: Session | None = None,
+) -> ChatResponse | None:
+    if intent == "greeting":
+        answer = (
+            "Hi, I am DoorIQ. Ask me about commercial doors, frames, hardware, "
+            "ADA/accessibility, fire ratings, egress, maglocks, automatic operators, "
+            "or product matches from the United Doors & Hardware catalog."
+        )
+    elif intent == "out_of_scope":
+        answer = (
+            "I am focused on commercial doors, frames, hardware, accessibility, "
+            "egress, fire ratings, and related product or code guidance. Ask me a "
+            "DoorIQ question and I will help narrow it down."
+        )
+    else:
+        return None
+
+    return ChatResponse(
+        session_id=session_id,
+        intent=intent,
+        answer=answer,
+        requirements=[],
+        allowed_options=[],
+        risky_or_not_allowed=[],
+        recommended_products=[],
+        code_references=[],
+        knowledge_references=[],
+        missing_information=[],
+        should_capture_lead=False,
+        lead_capture_status=get_lead_capture_status(
+            db.get(ChatSession, session_id) if db is not None else None
+        ),
+        confidence="medium",
+        human_review_recommended=False,
+    )
+
+
 def build_chat_response(request: ChatRequest, db: Session | None = None) -> ChatResponse:
     session_id = request.session_id or str(uuid4())
     intent = detect_intent(request.message)
+    special_response = _build_special_chat_response(request, session_id, intent, db)
+    if special_response is not None:
+        return special_response
+
     normalized_intent = normalize_intent(intent)
     guidance = get_guidance_for_intent(normalized_intent)
     application = request.building.application if request.building else None

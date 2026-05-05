@@ -1,6 +1,58 @@
 from app.services.seed_qa_service import find_seed_qa_for_question, get_primary_seed_intent
 
 
+GREETING_MESSAGES = {
+    "hi",
+    "hello",
+    "hey",
+    "good morning",
+    "good afternoon",
+    "good evening",
+}
+
+DOORIQ_DOMAIN_KEYWORDS = [
+    "ada",
+    "access",
+    "accessible",
+    "building",
+    "closer",
+    "code",
+    "commercial",
+    "corridor",
+    "door",
+    "egress",
+    "entrance",
+    "exit",
+    "fire",
+    "frame",
+    "hardware",
+    "hinge",
+    "hospital",
+    "lock",
+    "maglock",
+    "operator",
+    "panic",
+    "rated",
+    "school",
+]
+
+QUESTION_STARTERS = (
+    "can ",
+    "could ",
+    "does ",
+    "do ",
+    "how ",
+    "is ",
+    "should ",
+    "what ",
+    "when ",
+    "where ",
+    "which ",
+    "who ",
+    "why ",
+)
+
+
 INTENT_KEYWORDS = {
     "maglock_analysis": [
         "maglock",
@@ -112,11 +164,25 @@ def detect_intent(message: str) -> str:
         seed_intent = get_primary_seed_intent(seed_qa)
         return LEGACY_INTENTS.get(seed_intent, seed_intent)
 
-    normalized_message = message.lower()
+    normalized_message = message.strip().lower()
+    normalized_compact_message = " ".join(normalized_message.split())
+
+    if normalized_compact_message.rstrip("!.?") in GREETING_MESSAGES:
+        return "greeting"
 
     for intent, keywords in INTENT_KEYWORDS.items():
         if any(keyword in normalized_message for keyword in keywords):
             return LEGACY_INTENTS.get(intent, intent)
+
+    has_domain_context = any(
+        keyword in normalized_message
+        for keyword in DOORIQ_DOMAIN_KEYWORDS
+    )
+    looks_like_question = normalized_message.endswith("?") or normalized_message.startswith(
+        QUESTION_STARTERS
+    )
+    if looks_like_question and not has_domain_context:
+        return "out_of_scope"
 
     return "general"
 

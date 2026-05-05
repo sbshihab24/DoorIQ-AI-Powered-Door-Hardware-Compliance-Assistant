@@ -22,3 +22,11 @@ def test_detects_dataset_specific_operator_intent() -> None:
 
 def test_detects_product_match_intent() -> None:
     assert detect_intent("What door frame should I use for a masonry opening?") == "product_match"
+
+
+def test_detects_greeting_intent() -> None:
+    assert detect_intent("hello") == "greeting"
+
+
+def test_detects_unrelated_question_as_out_of_scope() -> None:
+    assert detect_intent("What is the capital of France?") == "out_of_scope"

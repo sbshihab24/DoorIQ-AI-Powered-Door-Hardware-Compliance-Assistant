@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 from openai import OpenAI
@@ -9,6 +10,7 @@ from app.core.config import settings
 
 
 GROQ_OPENAI_BASE_URL = "https://api.groq.com/openai/v1"
+ALLOW_LLM_DURING_TESTS_ENV = "DOORIQ_ALLOW_LLM_DURING_TESTS"
 
 SYSTEM_PROMPT = """You write concise answers for DoorIQ, a commercial door and hardware chatbot.
 Use only the supplied structured context.
@@ -19,6 +21,9 @@ Mention human/AHJ review when the context says it is needed."""
 
 
 def _provider_config() -> tuple[str, str, str, str | None] | None:
+    if os.getenv("PYTEST_CURRENT_TEST") and not os.getenv(ALLOW_LLM_DURING_TESTS_ENV):
+        return None
+
     if settings.openai_api_key:
         return ("openai", settings.openai_api_key, settings.openai_chat_model, None)
 

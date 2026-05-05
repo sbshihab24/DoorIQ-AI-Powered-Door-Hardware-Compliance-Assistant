@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.core.config import settings
 from app.db.session import Base, get_db
 from app.main import app
 
@@ -27,6 +28,12 @@ def override_get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+@pytest.fixture(autouse=True)
+def disable_real_llm_keys(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(settings, "openai_api_key", None)
+    monkeypatch.setattr(settings, "groq_api_key", None)
 
 
 @pytest.fixture(autouse=True)

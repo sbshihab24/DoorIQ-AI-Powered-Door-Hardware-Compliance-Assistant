@@ -136,3 +136,24 @@ def test_build_chat_response_uses_medium_confidence_for_complete_context() -> No
 
     assert response.confidence == "low"
     assert response.human_review_recommended is False
+
+
+def test_build_chat_response_handles_greeting_without_door_pipeline() -> None:
+    response = build_chat_response(ChatRequest(message="Hi"))
+
+    assert response.intent == "greeting"
+    assert "DoorIQ" in response.answer
+    assert response.missing_information == []
+    assert response.recommended_products == []
+    assert response.should_capture_lead is False
+    assert response.human_review_recommended is False
+
+
+def test_build_chat_response_redirects_unrelated_questions() -> None:
+    response = build_chat_response(ChatRequest(message="What is the capital of France?"))
+
+    assert response.intent == "out_of_scope"
+    assert "commercial doors" in response.answer
+    assert response.missing_information == []
+    assert response.recommended_products == []
+    assert response.should_capture_lead is False
