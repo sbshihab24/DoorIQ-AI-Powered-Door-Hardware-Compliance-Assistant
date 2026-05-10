@@ -18,6 +18,52 @@ def slugify(value: str) -> str:
     return value.strip("-")
 
 
+PRODUCT_SOURCE_URLS = {
+    "KD Drywall Frame": "https://uniteddoorsandlocks.com/products/kd-drywall-frame",
+    "KD Masonry Frame": "https://uniteddoorsandlocks.com/products/kd-masonry-frame",
+    "Welded Metal Frame": "https://uniteddoorsandlocks.com/products/welded-metal-frame",
+    "Cased Opening Frame": "https://uniteddoorsandlocks.com/products/cased-opening-frame",
+    "Hollow Metal Borrowed Lite Frame": "https://uniteddoorsandlocks.com/products/hollow-metal-borrowed-lite-frame",
+    "Hollow Metal Sidelite Frame": "https://uniteddoorsandlocks.com/products/hollow-metal-sidelite-frame",
+    "Hollow Metal Transom Frame": "https://uniteddoorsandlocks.com/products/hollow-metal-transom-frame",
+    "Double Egress Hollow Metal Frame": "https://uniteddoorsandlocks.com/products/double-egress-hollow-metal-frame",
+    "Commercial Wood Door with Louver": "https://uniteddoorsandlocks.com/products/commercial-wood-door-with-louver",
+    "Commercial Wood Door with Glass": "https://uniteddoorsandlocks.com/products/commercial-wood-door-with-glass",
+    "Fire-Rated Mineral Core Wood Doors": "https://uniteddoorsandlocks.com/products/fire-rated-mineral-core-wood-doors",
+    "Stain Grade Solid Core Wood Doors": "https://uniteddoorsandlocks.com/products/stain-grade-solid-core-wood-doors",
+    "Prefinished Solid Core Wood Doors": "https://uniteddoorsandlocks.com/products/prefinished-solid-core-wood-doors",
+    "Paint Grade Primed MDF Solid Core Wood Door": "https://uniteddoorsandlocks.com/products/paint-grade-primed-mdf-solid-core-wood-door",
+    "Double Doors - Hollow Metal Pairs": "https://uniteddoorsandlocks.com/products/double-doors-hollow-metal-pairs",
+    "Metal Building Doors": "https://uniteddoorsandlocks.com/products/metal-building-doors",
+    "2-Panel Embossed Hollow Metal Door": "https://uniteddoorsandlocks.com/products/2-panel-embossed-hollow-metal-door",
+    "6-Panel Embossed Hollow Metal Door": "https://uniteddoorsandlocks.com/products/6-panel-embossed-hollow-metal-door",
+    "Hollow Metal Door with Louver": "https://uniteddoorsandlocks.com/products/hollow-metal-door-with-louver",
+    "Hollow Metal Door with Lite Kit & Glass": "https://uniteddoorsandlocks.com/products/hollow-metal-door-with-lite-kit-glass",
+    "Fire-Rated Metal Door": "https://uniteddoorsandlocks.com/products/fire-rated-metal-door",
+    "Flush Commercial Hollow Metal Doors": "https://uniteddoorsandlocks.com/products/flush-commercial-hollow-metal-doors",
+    "Spartan 18PS Series Hollow Metal Door": "https://uniteddoorsandlocks.com/products/spartan-18ps",
+    "700 Series Heavy Duty Door Closer": "https://uniteddoorsandlocks.com/products/700-series-door-closer",
+    "600 Series Heavy Duty Door Closer": "https://uniteddoorsandlocks.com/products/600-series-door-closer",
+    "800 Series Heavy Duty Door Closer": "https://uniteddoorsandlocks.com/products/800-series-door-closer",
+    "900 Series Heavy Duty Door Closer": "https://uniteddoorsandlocks.com/products/900-series-door-closer",
+    "H4545 Series Plain Bearing Hinge": "https://uniteddoorsandlocks.com/products/h4545-plain",
+    "H4545 Series Ball Bearing Hinge": "https://uniteddoorsandlocks.com/products/h4545-ball",
+    "Tell Spring Hinge": "https://uniteddoorsandlocks.com/products/spring-hinges",
+    "ML1300 Series Cortland Heavy Duty Mortise Lock": "https://uniteddoorsandlocks.com/products/ml1300-series",
+    "LC2600 Series Cortland Standard Duty Lock": "https://uniteddoorsandlocks.com/products/lc2600-series",
+    "LC2400 Series Cortland Heavy Duty Lock": "https://uniteddoorsandlocks.com/products/lc2400-series",
+    "LC1200 Series Cortland Heavy Duty Lock": "https://uniteddoorsandlocks.com/products/lc1200-series",
+    "KC2300 Series Empire Heavy Duty Lock": "https://uniteddoorsandlocks.com/products/kc2300-series",
+    "DB2000 Series Grade 2 Standard Duty Deadbolt": "https://uniteddoorsandlocks.com/products/db2000-series",
+    "DB1000 Series Grade 1 Heavy Duty Deadbolt": "https://uniteddoorsandlocks.com/products/db1000-series",
+    "Accentra 2100 Series Rim Exit Device": "https://uniteddoorsandlocks.com/products/accentra-2100-rim-exit-series",
+    "8300A Heavy Duty Rim Device 48 Inch": "https://uniteddoorsandlocks.com/products/8300a-rim-device-48",
+    "QCL140-E-626 Privacy Lever Lock": "https://uniteddoorsandlocks.com/products/qcl140-e-626-privacy-lever-lock",
+    "QCL130-E-626 Passage Lever Set": "https://uniteddoorsandlocks.com/products/qcl130-e-626-passage-lever-set",
+    "Schlage ALX10 SAT Saturn Grade-2 Passage Lever": "https://uniteddoorsandlocks.com/products/alx10-sat-saturn-passage-lever",
+}
+
+
 def product(
     name: str,
     category: str,
@@ -34,7 +80,7 @@ def product(
         "category": category,
         "description": description,
         "compatible_applications": compatible_applications,
-        "source_url": source_url,
+        "source_url": source_url or PRODUCT_SOURCE_URLS.get(name),
         "starting_price_usd": price,
         "fire_rating": fire_rating,
     }
@@ -89,13 +135,6 @@ HARDWARE_CATALOG = [
     product("Schlage ALX10 SAT Saturn Grade-2 Passage Lever", "lock", "Grade 2 passage lever lock listed for use on 3-hour fire doors and ADA-compliant designs.", ["passage lock", "lever lock", "ada hardware", "fire rated"], price=129.6, fire_rating="UL listed for use on 3-hour fire doors"),
 ]
 
-SOLUTION_FAMILIES = [
-    product("Rim Exit Device", "exit device", "Panic or fire exit hardware family for egress doors.", ["egress", "exit", "panic hardware", "exit device", "commercial door"]),
-    product("Surface Door Closer", "closer", "Self-closing hardware family for commercial and rated doors.", ["fire rated", "fire door", "egress", "commercial door", "closer"]),
-    product("Automatic Door Operator", "operator", "Automatic opening support family for accessible public entrances.", ["accessible route", "entrance", "ada", "hospital entrance", "automatic operator", "operator"]),
-]
-
-
 CODE_FRAMEWORK = [
     {"source_or_code_family": "ICC Digital Codes / Codes by Location", "type": "jurisdiction portal", "covers": "State, county, and city code adoption and amendments.", "typical_questions": ["state code lookup", "city amendments", "adopted edition"], "source_url": "https://codes.iccsafe.org/"},
     {"source_or_code_family": "Model code: IBC Chapter 10 Means of Egress", "type": "model code", "covers": "Door swing, egress, panic hardware, locking arrangements, and exit access conditions.", "typical_questions": ["Do I need panic hardware?", "Must the door swing out?", "Can this lock on egress?"], "source_url": "https://codes.iccsafe.org/content/IBC2021P2/chapter-10-means-of-egress"},
@@ -103,7 +142,45 @@ CODE_FRAMEWORK = [
     {"source_or_code_family": "ADA Guide: Chapter 4 Entrances, Doors, and Gates", "type": "federal guidance", "covers": "Plain-language guidance for accessible entrances and manual or automatic doors.", "typical_questions": ["How many entrances must be accessible?", "What clearances are needed?"], "source_url": "https://www.access-board.gov/ada/guides/chapter-4-entrances-doors-and-gates/"},
     {"source_or_code_family": "ICC A117.1 / state accessibility code", "type": "accessibility standard", "covers": "Technical accessibility dimensions adopted by many states through IBC.", "typical_questions": ["Maneuvering clearances", "thresholds", "reach ranges"], "source_url": "https://codes.iccsafe.org/"},
     {"source_or_code_family": "ANSI/BHMA A156 family", "type": "product standard", "covers": "Hardware performance, grade, and operation standards.", "typical_questions": ["Is this product grade 1?", "Which operator standard applies?"], "source_url": "https://buildershardware.com/"},
+    {"source_or_code_family": "NFPA 80", "type": "fire door standard", "covers": "Fire doors, frames, hardware labels, modifications, inspections, self-closing, and positive latching.", "typical_questions": ["Can I change this rated door?", "What hardware is allowed on a fire door?"], "source_url": "https://codes.iccsafe.org/"},
+    {"source_or_code_family": "NFPA 101 Life Safety Code", "type": "life safety standard", "covers": "Healthcare, assembly, educational, and other occupancy egress requirements.", "typical_questions": ["Hospital corridor openings", "School egress doors", "Locking in healthcare units"], "source_url": "https://codes.iccsafe.org/"},
+    {"source_or_code_family": "State building code adoption page", "type": "jurisdiction source", "covers": "Official adopted code edition and effective date.", "typical_questions": ["What code applies in my state?"], "source_url": "https://codes.iccsafe.org/codes/united-states"},
+    {"source_or_code_family": "City / county amendments portal", "type": "jurisdiction source", "covers": "Local amendments and municipal code text.", "typical_questions": ["What does my city require beyond the state code?"], "source_url": "https://codes.iccsafe.org/codes/united-states"},
+    {"source_or_code_family": "Healthcare overlay sources", "type": "program-specific", "covers": "Hospital and healthcare occupancies may trigger additional guidance or agency review.", "typical_questions": ["Hospital entrance doors", "Smoke barriers", "Patient room exceptions"], "source_url": "https://www.access-board.gov/ada/guides/chapter-4-entrances-doors-and-gates/"},
     {"source_or_code_family": "School / education overlay sources", "type": "program-specific", "covers": "Education occupancy agency, fire marshal, district, and AHJ requirements.", "typical_questions": ["School exit doors", "classroom locks", "lockdown hardware"], "source_url": "https://codes.iccsafe.org/codes/united-states"},
+]
+
+
+DIVISION_TAXONOMY = [
+    {"division": "08", "section": "08 10 00", "title": "Doors and Frames", "door_ai_relevance": "Core", "notes": "Primary spec bucket for door and frame systems.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 11 00", "title": "Metal Doors and Frames", "door_ai_relevance": "Core", "notes": "Steel frames and metal door assemblies.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 11 16", "title": "Aluminum Doors and Frames", "door_ai_relevance": "Core", "notes": "Aluminum framed door systems.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 13 00", "title": "Metal Doors", "door_ai_relevance": "Core", "notes": "Metal doors separated from frame-specific sections.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 16 13", "title": "Fiberglass Doors", "door_ai_relevance": "Related", "notes": "Alternate exterior/interior door material type.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 31 00", "title": "Access Doors and Panels", "door_ai_relevance": "Related", "notes": "Service access panels, not primary passage doors.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 32 13", "title": "Sliding Aluminum-Framed Glass Doors", "door_ai_relevance": "Core", "notes": "Sliding door logic and accessibility/egress questions.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 33 00", "title": "Coiling Doors and Grilles", "door_ai_relevance": "Related", "notes": "Rolling/coiling openings; often commercial back-of-house.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 34 00", "title": "Special Function Doors", "door_ai_relevance": "Core", "notes": "Cleanroom, hydraulic, smoke curtain, specialty doors.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 34 73", "title": "Sound Control Door Assemblies", "door_ai_relevance": "Related", "notes": "Acoustic openings; often institutional/education.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 35 00", "title": "Folding Doors and Grilles", "door_ai_relevance": "Related", "notes": "Accordion and side-folding systems.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 41 00", "title": "Entrances and Storefronts", "door_ai_relevance": "Core", "notes": "Public entrances/storefront openings.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 41 13", "title": "Aluminum-Framed Entrances and Storefronts", "door_ai_relevance": "Core", "notes": "Typical commercial storefront entrance package.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 41 26", "title": "All-Glass Entrances and Storefronts", "door_ai_relevance": "Core", "notes": "Glass entrance logic, hardware, accessibility.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 42 00", "title": "Entrances", "door_ai_relevance": "Core", "notes": "Steel entrance door systems and related assemblies.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 71 00", "title": "Door Hardware", "door_ai_relevance": "Core", "notes": "Locks, closers, hinges, exit devices, gasketing.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 71 13", "title": "Automatic Door Operators", "door_ai_relevance": "Core", "notes": "Low-energy operators and automatic openers.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 81 00", "title": "Glass Glazing", "door_ai_relevance": "Related", "notes": "Lite kits, fire-rated glazing, storefront glass.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "08", "section": "08 88 00", "title": "Special Function Glazing", "door_ai_relevance": "Related", "notes": "Fire/special glazing paired with door lites.", "source_url": "https://www.arcat.com/content-type/spec/openings-08"},
+    {"division": "10", "section": "10 1400", "title": "Signage", "door_ai_relevance": "Adjacent", "notes": "Affects accessible entrance signage and code wayfinding.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 1440", "title": "Wayfinding", "door_ai_relevance": "Adjacent", "notes": "Relevant when directing users to accessible entrances/egress routes.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 2154", "title": "Healthcare Cubicle Curtains & Hardware", "door_ai_relevance": "Adjacent", "notes": "Useful for hospital package recommendations but not door logic.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 2210", "title": "Folding & Coiling Gates", "door_ai_relevance": "Related", "notes": "Can overlap with secure openings and ancillary closures.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 2230", "title": "Operable Partitions", "door_ai_relevance": "Adjacent", "notes": "Movable partition systems often discussed with school/hospital space separation.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 2830", "title": "Grab Bars", "door_ai_relevance": "Adjacent", "notes": "Accessibility specialty relevant to bathroom packages, not door logic itself.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 4400", "title": "Fire Protection Specialties", "door_ai_relevance": "Adjacent", "notes": "Fire/life-safety package context around openings.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 4600", "title": "Luminous Egress Path Markings", "door_ai_relevance": "Adjacent", "notes": "Egress-related specialty sometimes packaged with door/exit upgrades.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 5190", "title": "Locks & Locker Room Accessories", "door_ai_relevance": "Adjacent", "notes": "Lock specialty; usually not opening hardware spec.", "source_url": "https://www.4specs.com/s/10.html"},
+    {"division": "10", "section": "10 5784", "title": "Closet Doors", "door_ai_relevance": "Related", "notes": "Residential-adjacent door category; lower priority for commercial bot.", "source_url": "https://www.4specs.com/s/10.html"},
 ]
 
 
@@ -256,7 +333,7 @@ def main() -> None:
 
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     seed_qa = build_seed_qa()
-    products = DOOR_CATALOG + HARDWARE_CATALOG + SOLUTION_FAMILIES
+    products = DOOR_CATALOG + HARDWARE_CATALOG
     knowledge_snippets = build_knowledge_snippets(seed_qa)
     chunks = [
         {
@@ -271,6 +348,7 @@ def main() -> None:
 
     write_json("products.json", products)
     write_json("hardware.json", HARDWARE_CATALOG)
+    write_json("division_taxonomy.json", DIVISION_TAXONOMY)
     write_json("code_framework.json", CODE_FRAMEWORK)
     write_json("local_code_schema.json", LOCAL_CODE_SCHEMA)
     write_json("intents.json", INTENTS)
@@ -286,7 +364,7 @@ def main() -> None:
                 "products": len(products),
                 "door_catalog": len(DOOR_CATALOG),
                 "hardware_catalog": len(HARDWARE_CATALOG),
-                "solution_families": len(SOLUTION_FAMILIES),
+                "division_taxonomy": len(DIVISION_TAXONOMY),
                 "intents": len(INTENTS),
                 "seed_qa": len(seed_qa),
                 "knowledge_chunks": len(chunks),

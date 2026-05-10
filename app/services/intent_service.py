@@ -1,4 +1,4 @@
-from app.services.seed_qa_service import find_seed_qa_for_question, get_primary_seed_intent
+import re
 
 
 GREETING_MESSAGES = {
@@ -20,6 +20,7 @@ DOORIQ_DOMAIN_KEYWORDS = [
     "commercial",
     "corridor",
     "door",
+    "exact answer",
     "egress",
     "entrance",
     "exit",
@@ -79,6 +80,7 @@ INTENT_KEYWORDS = {
         "revolving door",
     ],
     "fire_rating_analysis": [
+        "fire rate",
         "fire rated",
         "fire-rated",
         "fire rating",
@@ -115,8 +117,12 @@ INTENT_KEYWORDS = {
     "product_match": [
         "product",
         "products",
+        "suggestion",
+        "suggestions",
         "show me",
         "options",
+        "link",
+        "links",
         "frame should",
         "door frame",
         "metal building",
@@ -135,12 +141,16 @@ INTENT_KEYWORDS = {
         "electrify",
     ],
     "door_type_recommendation": [
+        "doors for",
+        "need a door",
+        "need an office door",
         "what door",
         "door can be used",
         "door should",
         "best door",
         "door type",
         "entrance door",
+        "corridor renovation",
         "double egress frame",
     ],
     "quote_handoff": ["quote", "pricing", "submittal", "price"],
@@ -157,22 +167,45 @@ INTENT_ALIASES = {
 
 LEGACY_INTENTS = {value: key for key, value in INTENT_ALIASES.items()}
 
+INTENT_TIEBREAK_ORDER = [
+    "maglock_analysis",
+    "delayed_egress_analysis",
+    "sliding_door_analysis",
+    "automatic_operator_recommendation",
+    "accessibility_analysis",
+    "fire_rating_analysis",
+    "egress_analysis",
+    "applicable_code_lookup",
+    "code_section_navigation",
+    "product_match",
+    "hardware_allowance",
+    "quote_handoff",
+    "door_type_recommendation",
+]
+
 
 def detect_intent(message: str) -> str:
-    seed_qa = find_seed_qa_for_question(message)
-    if seed_qa is not None:
-        seed_intent = get_primary_seed_intent(seed_qa)
-        return LEGACY_INTENTS.get(seed_intent, seed_intent)
-
     normalized_message = message.strip().lower()
     normalized_compact_message = " ".join(normalized_message.split())
 
     if normalized_compact_message.rstrip("!.?") in GREETING_MESSAGES:
         return "greeting"
 
+    if re.search(r"\b(20|45|60|90)\s*(?:min|mins|minute|minutes)\b", normalized_message):
+        return LEGACY_INTENTS.get("fire_rating_analysis", "fire_rating_analysis")
+
+    if "doors and hardware" in normalized_message and "required" in normalized_message:
+        return LEGACY_INTENTS.get("door_type_recommendation", "door_type_recommendation")
+
+    scored_intents = []
     for intent, keywords in INTENT_KEYWORDS.items():
-        if any(keyword in normalized_message for keyword in keywords):
-            return LEGACY_INTENTS.get(intent, intent)
+        score = sum(1 for keyword in keywords if keyword in normalized_message)
+        if score:
+            scored_intents.append((score, INTENT_TIEBREAK_ORDER.index(intent), intent))
+
+    if scored_intents:
+        _, _, intent = max(scored_intents, key=lambda item: (item[0], -item[1]))
+        return LEGACY_INTENTS.get(intent, intent)
 
     has_domain_context = any(
         keyword in normalized_message

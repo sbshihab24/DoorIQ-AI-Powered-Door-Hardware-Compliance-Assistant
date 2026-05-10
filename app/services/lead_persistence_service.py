@@ -11,8 +11,12 @@ def create_lead_record(db: Session, lead: LeadCreate) -> Lead:
         chat_session = ChatSession(id=lead.session_id)
         db.add(chat_session)
 
-    chat_session.email = lead.email
-    chat_session.phone = lead.phone
+    if lead.email:
+        chat_session.email = lead.email
+    if lead.phone:
+        chat_session.phone = lead.phone
+    if lead.name:
+        chat_session.lead_name = lead.name
 
     lead_record = Lead(
         session_id=lead.session_id,

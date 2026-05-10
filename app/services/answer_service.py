@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from app.schemas.chat import (
     ChatRequest,
     CodeReference,
@@ -8,106 +10,199 @@ from app.schemas.chat import (
 )
 from app.services.intent_service import normalize_intent
 from app.services.llm_service import generate_llm_answer
-from app.services.seed_qa_service import find_seed_qa_for_question
+from app.services.project_facts_service import ProjectFacts, extract_project_facts
 
 
-INTENT_SUMMARIES = {
-    "maglock_analysis": "Maglocks are conditional: review egress role, release method, occupancy, fire rating, and local amendments before selecting access-control hardware.",
-    "accessibility_analysis": "Accessibility depends on whether the opening is on an accessible route and on clear width, maneuvering clearance, threshold, force, and operable hardware.",
-    "applicable_code_lookup": "Exact code guidance needs jurisdiction context, especially state, ZIP, adopted code edition, and local amendments.",
-    "egress_analysis": "Egress hardware depends on occupancy, occupant load, exit-path use, unlatching rules, panic hardware needs, and local code.",
-    "fire_rating_analysis": "Rated openings require compatible labeled doors, frames, glazing, latching, and closing hardware.",
-    "hardware_allowance": "Hardware should be selected from the door use, egress role, rating, traffic level, and access-control intent.",
-    "door_type_recommendation": "Door and frame selection depends on opening location, material, rating, traffic level, accessibility, and egress role.",
-    "product_match": "Product matching should start with the opening type, rating, dimensions, finish, hardware family, and project constraints.",
-    "sliding_door_analysis": "Sliding doors need review for occupancy, egress function, accessible-route status, and any required breakout or alternate swing door.",
-    "delayed_egress_analysis": "Delayed egress is a life-safety condition that depends on occupancy, security use case, alarm/sprinkler conditions, and AHJ approval.",
-    "automatic_operator_recommendation": "Automatic operator recommendations depend on entrance type, accessible-route requirements, user population, and power availability.",
-    "code_section_navigation": "Exact code-section navigation requires the jurisdiction, adopted code family, edition, and amendment context.",
-    "quote_handoff": "For quote handoff, package the project facts, selected products, jurisdiction, and contact details for follow-up.",
-}
+def _opening_label(facts: ProjectFacts) -> str:
+    parts = []
+    for part in [facts.location_type, facts.building_type, facts.application]:
+        if not part or part in parts:
+            continue
+        parts.append(part)
+    label = " ".join(part for part in parts if part)
+    if not label:
+        return "this opening"
+    return label.replace(" opening", "").strip()
 
 
-def _sentence_list(values: list[str], limit: int = 2) -> str:
+def _article_for(label: str) -> str:
+    return "an" if label[:1].lower() in {"a", "e", "i", "o", "u"} else "a"
+
+
+def _opening_summary(
+    request: ChatRequest,
+    normalized_intent: str,
+    fallback: str,
+    facts: ProjectFacts,
+) -> str:
+    label = _opening_label(facts)
+
+    if label != "this opening":
+        return f"Dataset-grounded starting point for {_article_for(label)} {label}:"
+
+    return fallback
+
+
+def _bullet_list(values: list[str], limit: int = 3) -> str:
     selected_values = [value.rstrip(".") for value in values[:limit]]
     if not selected_values:
         return ""
 
-    return "; ".join(selected_values) + "."
+    return "\n".join(f"- {value}" for value in selected_values)
 
 
-def _product_summary(recommended_products: list[RecommendedProduct]) -> str:
+def _requested_rating_minutes(text: str) -> str | None:
+    match = re.search(r"\b(20|45|60|90)\s*(?:min|mins|minute|minutes)?\b", text)
+    return match.group(1) if match else None
+
+
+def _question_list(missing_information: list[str]) -> list[str]:
+    question_by_field = {
+        "building_type": "What type of building is it?",
+        "location": "Is the opening interior or exterior?",
+        "interior_exterior": "Is it an interior or exterior opening?",
+        "rating": "Does the corridor/opening need a fire rating, such as 20, 45, 60, or 90 minutes?",
+        "traffic": "Is it light, normal, or high traffic?",
+        "material_preference": "Do you prefer hollow metal, wood, aluminum/storefront, or no preference?",
+        "state": "What state is the project in?",
+        "zip_code": "What ZIP code should I use for local code context?",
+        "hardware_type": "What hardware do you need: closer, exit device, lockset, hinges, access control, or a full set?",
+        "finish": "Do you have a finish preference?",
+        "brand_preference": "Do you have a preferred hardware brand?",
+        "wall_type": "What wall or barrier is this opening in: corridor wall, smoke barrier, fire barrier, stair enclosure, or something else?",
+        "barrier_type": "What wall or barrier is this opening in: corridor wall, smoke barrier, fire barrier, stair enclosure, or something else?",
+        "path_of_egress": "Is this door part of the egress path?",
+        "egress_path": "Is this door part of the egress path?",
+        "lock_type": "Will this use panic hardware, a latchset, access control, or another lock type?",
+    }
+    questions = []
+    seen_questions = set()
+    for field in missing_information:
+        question = question_by_field.get(field, field.replace("_", " ").capitalize())
+        if question in seen_questions:
+            continue
+        seen_questions.add(question)
+        questions.append(question)
+
+    return questions
+
+
+def _product_summary(
+    recommended_products: list[RecommendedProduct],
+    missing_information: list[str],
+    include_links: bool,
+    request_text: str = "",
+) -> str:
     if not recommended_products:
         return ""
 
-    product_names = [product.name for product in recommended_products[:3]]
-    if len(product_names) == 1:
-        return f"Relevant product match: {product_names[0]}."
+    product_candidates = recommended_products
+    if not include_links:
+        product_candidates = [
+            product
+            for product in recommended_products
+            if product.category in {"door", "frame"}
+            and product.fire_rating
+            and "not stated" not in product.fire_rating.lower()
+        ]
+        requested_rating = _requested_rating_minutes(request_text)
+        if requested_rating:
+            product_candidates = [
+                product
+                for product in product_candidates
+                if requested_rating in product.fire_rating.lower()
+                or "3 hour" in product.fire_rating.lower()
+                or "3-hour" in product.fire_rating.lower()
+            ]
 
-    return f"Relevant product matches: {', '.join(product_names)}."
+    if not product_candidates:
+        return ""
+
+    product_lines = []
+    for product in product_candidates[:3]:
+        details = []
+        if product.fire_rating:
+            details.append(f"rating: {product.fire_rating}")
+        if product.starting_price_usd:
+            details.append(f"from ${product.starting_price_usd:g}")
+        label = f"{product.name}"
+        if details:
+            label = f"{label} ({', '.join(details)})"
+        if include_links and product.source_url:
+            label = f"{label}\n  {product.source_url}"
+        if product.notes:
+            label = f"{label}\n  {product.notes}"
+        product_lines.append(label)
+
+    if not include_links:
+        heading = "Door options to consider"
+    else:
+        heading = "Possible products" if missing_information else "Recommended products"
+    return f"{heading}:\n{_bullet_list(product_lines)}"
 
 
 def _source_summary(
     code_references: list[CodeReference],
     knowledge_references: list[KnowledgeReference],
 ) -> str:
-    source_titles = []
-    for reference in [*code_references[:1], *knowledge_references[:2]]:
-        source_titles.append(reference.title)
+    source_lines = []
+    for reference in code_references[:2]:
+        if reference.url:
+            source_lines.append(f"{reference.title}\n  {reference.url}")
 
-    if not source_titles:
+    if not source_lines:
         return ""
 
-    return f"Grounded by: {', '.join(source_titles)}."
+    return f"Code links:\n{_bullet_list(source_lines, limit=2)}"
 
 
 def _missing_information_summary(missing_information: list[str]) -> str:
     if not missing_information:
-        return "I have the basic project context needed for a first-pass recommendation."
+        return "What I need next:\n- Nothing else for a first-pass recommendation"
 
-    readable_fields = [field.replace("_", " ") for field in missing_information]
-    return f"To make this more precise, I still need: {', '.join(readable_fields)}."
+    return f"What I need next:\n{_bullet_list(_question_list(missing_information), limit=6)}"
 
 
-def _seed_output_summary(request: ChatRequest) -> str:
-    seed_qa = find_seed_qa_for_question(request.message)
-    if seed_qa is None:
-        return ""
+def _should_show_products(normalized_intent: str, request: ChatRequest) -> bool:
+    text = request.message.lower()
+    product_terms = ["product", "products", "options", "suggestion", "suggestions", "link", "links", "quote", "pricing", "price", "submittal"]
+    return normalized_intent in {"product_match", "quote_handoff"} or any(
+        term in text for term in product_terms
+    )
 
-    recommended_output = str(seed_qa.get("recommended_output", "")).lower()
 
-    if "jurisdiction stack" in recommended_output:
-        return "For exact code guidance, confirm the state and ZIP, then cite the governing jurisdiction stack and source URLs."
-    if "manual vs low-energy vs full-power" in recommended_output:
-        return "Compare manual, low-energy, and full-power operator paths before selecting an automatic operator."
-    if "conditional answer + ahj" in recommended_output:
-        return "This is conditional and should be treated as an AHJ-review item before final approval."
-    if "conditional integration answer" in recommended_output:
-        return "Treat the maglock and panic hardware combination as an integrated listed-hardware question, not as two separate parts."
-    if "conditional allow + listed components only" in recommended_output:
-        return "Electrified rated openings should use only listed components compatible with the labeled assembly."
-    if "conditional allow / not allow" in recommended_output:
-        return "Give this as a conditional allow-or-not-allow answer and include practical alternatives."
-    if "matched product list" in recommended_output:
-        return "Return this as a matched product list with the most relevant doors, frames, and hardware called out."
-    if "website frame options" in recommended_output:
-        return "Compare the website frame options and note the main pros, cons, rating, and wall-condition differences."
-    if "website options" in recommended_output:
-        return "Use website catalog options first, then add configuration notes for rating, size, finish, and hardware."
-    if "exact section" in recommended_output:
-        return "For section lookup, identify the likely code section and note that the adopted edition must be confirmed."
-    if "state/zip" in recommended_output:
-        return "For an exact answer, collect state/ZIP, building type, space type, rating status, access-control intent, and whether the work is new or existing."
-    if "60%" in recommended_output:
-        return "For new construction, the baseline accessibility path is at least 60% of public entrances, with project-specific caveats."
-    if "separate compliant door" in recommended_output:
-        return "A revolving door should not be treated as the accessible entrance by itself; plan for a separate compliant door."
-    if "special maneuvering exception" in recommended_output:
-        return "Check the patient-room maneuvering-clearance exception before applying the standard latch-side clearance rule."
-    if "door/entrance package" in recommended_output:
-        return "Package the answer around the entrance door type, operator path, panic or egress hardware, accessibility, and code links."
+def _should_suggest_product_families(
+    normalized_intent: str,
+    facts: ProjectFacts,
+) -> bool:
+    has_rating = facts.rating_required is not None or facts.rating_minutes is not None
+    return (
+        normalized_intent in {"door_type_recommendation", "fire_rating_analysis"}
+        and facts.has_project_shape
+        and has_rating
+        and facts.location_type is not None
+    )
 
-    return ""
+
+def _dataset_guidance_summary(
+    knowledge_references: list[KnowledgeReference],
+    code_references: list[CodeReference],
+) -> str:
+    guidance_lines = []
+
+    for reference in knowledge_references[:3]:
+        guidance_lines.append(f"{reference.summary}\n  Source: {reference.source} / {reference.title}")
+
+    for reference in code_references[:2]:
+        source_line = reference.title
+        if reference.url:
+            source_line = f"{source_line} ({reference.url})"
+        guidance_lines.append(f"{reference.summary}\n  Source: {source_line}")
+
+    if not guidance_lines:
+        return "Dataset guidance:\n- I could not find a matching dataset record for this exact question. Provide building type, opening use, rating, egress role, state, and ZIP so I can retrieve a closer dataset match."
+
+    return f"Dataset guidance:\n{_bullet_list(guidance_lines, limit=5)}"
 
 
 def _llm_context(
@@ -122,12 +217,10 @@ def _llm_context(
     knowledge_references: list[KnowledgeReference],
     missing_information: list[str],
 ) -> dict:
-    seed_qa = find_seed_qa_for_question(request.message)
     return {
         "user_question": request.message,
         "intent": normalize_intent(intent),
         "template_answer": template_answer,
-        "seed_recommended_output": seed_qa.get("recommended_output") if seed_qa else None,
         "requirements": requirements,
         "allowed_options": allowed_options,
         "risky_or_not_allowed": risky_or_not_allowed,
@@ -165,28 +258,45 @@ def build_answer(
     missing_information: list[str],
 ) -> str:
     normalized_intent = normalize_intent(intent)
-    summary = INTENT_SUMMARIES.get(
+    facts = extract_project_facts(request)
+    summary = _opening_summary(
+        request,
         normalized_intent,
-        "I need more project details before I can give a reliable door and hardware recommendation.",
+        "Dataset-grounded starting point:",
+        facts,
     )
 
     answer_parts = [summary]
 
-    seed_output_summary = _seed_output_summary(request)
-    if seed_output_summary:
-        answer_parts.append(seed_output_summary)
+    answer_parts.append(
+        _dataset_guidance_summary(
+            knowledge_references=knowledge_references,
+            code_references=code_references,
+        )
+    )
 
-    if requirements:
-        answer_parts.append(f"Key requirements to confirm: {_sentence_list(requirements)}")
-
-    if allowed_options:
-        answer_parts.append(f"Likely viable path: {_sentence_list(allowed_options, limit=1)}")
-
-    if risky_or_not_allowed:
-        answer_parts.append(f"Watch-outs: {_sentence_list(risky_or_not_allowed, limit=1)}")
-
-    product_summary = _product_summary(recommended_products)
-    if product_summary:
+    show_products = _should_show_products(normalized_intent, request) or (
+        not missing_information
+        and normalized_intent in {"door_type_recommendation", "fire_rating_analysis"}
+    )
+    suggest_product_families = _should_suggest_product_families(normalized_intent, facts)
+    include_product_links = show_products or suggest_product_families
+    product_summary_candidates = recommended_products
+    if suggest_product_families and not _should_show_products(normalized_intent, request):
+        product_summary_candidates = [
+            product
+            for product in recommended_products
+            if product.category in {"door", "frame"}
+            and product.fire_rating
+            and "not stated" not in product.fire_rating.lower()
+        ]
+    product_summary = _product_summary(
+        product_summary_candidates,
+        missing_information,
+        include_links=include_product_links,
+        request_text=request.message.lower(),
+    )
+    if product_summary and (show_products or suggest_product_families):
         answer_parts.append(product_summary)
 
     source_summary = _source_summary(code_references, knowledge_references)
@@ -195,12 +305,7 @@ def build_answer(
 
     answer_parts.append(_missing_information_summary(missing_information))
 
-    if normalized_intent in {"applicable_code_lookup", "code_section_navigation"}:
-        answer_parts.append(
-            "Treat this as guidance from the starter dataset until the adopted local code and amendments are verified."
-        )
-
-    template_answer = " ".join(part for part in answer_parts if part)
+    template_answer = "\n\n".join(part for part in answer_parts if part)
     return generate_llm_answer(
         context=_llm_context(
             request=request,

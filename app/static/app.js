@@ -1,10 +1,8 @@
 const prompts = [
-  "What code applies to a school entrance in my state?",
   "Can I use a maglock and a panic bar together?",
-  "What products on your site fit a 90-minute corridor pair?",
   "Do I need an automatic operator on a hospital entrance door?",
-  "Can I electrify this fire-rated opening?",
-  "What information do you need before giving an exact answer?"
+  "What products fit a 90-minute corridor pair?",
+  "What information do you need for an exact answer?"
 ];
 
 let sessionId = null;
@@ -33,59 +31,36 @@ const elements = {
   accessibleRoute: document.querySelector("#accessibleRoute")
 };
 
-function textOrDash(value) {
-  return value || "-";
-}
-
 function appendMessage(role, text) {
   const article = document.createElement("article");
   article.className = `message ${role}`;
   const paragraph = document.createElement("p");
-  paragraph.textContent = text;
+  appendTextWithLinks(paragraph, text);
   article.append(paragraph);
   elements.messages.append(article);
   elements.messages.scrollTop = elements.messages.scrollHeight;
 }
 
-function pill(text, tone = "") {
-  const span = document.createElement("span");
-  span.className = `pill ${tone}`.trim();
-  span.textContent = text;
-  return span;
-}
+function appendTextWithLinks(container, text) {
+  const urlPattern = /(https?:\/\/[^\s)]+)/g;
+  let lastIndex = 0;
+  for (const match of text.matchAll(urlPattern)) {
+    if (match.index > lastIndex) {
+      container.append(document.createTextNode(text.slice(lastIndex, match.index)));
+    }
 
-function renderList(container, values, emptyText) {
-  container.replaceChildren();
-  if (!values || values.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty";
-    empty.textContent = emptyText;
-    container.append(empty);
-    return;
+    const link = document.createElement("a");
+    link.href = match[0];
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = match[0];
+    container.append(link);
+    lastIndex = match.index + match[0].length;
   }
-  values.forEach((value) => container.append(pill(value.replaceAll("_", " "))));
-}
 
-function renderCards(container, items, emptyText, mapItem) {
-  container.replaceChildren();
-  if (!items || items.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty";
-    empty.textContent = emptyText;
-    container.append(empty);
-    return;
+  if (lastIndex < text.length) {
+    container.append(document.createTextNode(text.slice(lastIndex)));
   }
-  items.forEach((item) => {
-    const card = document.createElement("article");
-    card.className = "card";
-    const title = document.createElement("strong");
-    const body = document.createElement("p");
-    const mapped = mapItem(item);
-    title.textContent = mapped.title;
-    body.textContent = mapped.body;
-    card.append(title, body);
-    container.append(card);
-  });
 }
 
 function requestPayload(message) {
@@ -111,35 +86,16 @@ function requestPayload(message) {
 function renderResponse(data) {
   sessionId = data.session_id;
   elements.sessionId.textContent = sessionId.slice(0, 8);
-  elements.confidence.textContent = textOrDash(data.confidence);
+  elements.confidence.textContent = data.confidence || "-";
   elements.leadState.textContent = data.should_capture_lead ? "Capture" : "Not needed";
-  elements.intent.textContent = textOrDash(data.intent);
-
-  elements.flags.replaceChildren(
-    pill(data.human_review_recommended ? "Human review" : "Self-serve", data.human_review_recommended ? "danger" : "ok"),
-    pill(data.should_capture_lead ? "Lead prompt" : "No lead prompt", data.should_capture_lead ? "warn" : ""),
-    pill(data.lead_capture_status?.lead_created ? "Lead saved" : "No lead saved", data.lead_capture_status?.lead_created ? "ok" : "")
-  );
-
-  renderList(elements.missingInfo, data.missing_information, "No missing information.");
-  renderCards(
-    elements.products,
-    data.recommended_products,
-    "No product matches yet.",
-    (product) => ({
-      title: product.name,
-      body: `${product.category}: ${product.reason}`
-    })
-  );
-  renderCards(
-    elements.sources,
-    [...(data.code_references || []), ...(data.knowledge_references || [])],
-    "No sources returned yet.",
-    (source) => ({
-      title: source.title,
-      body: source.summary || source.section || source.source || ""
-    })
-  );
+  elements.intent.textContent = data.intent || "Intent";
+  elements.flags.textContent = data.human_review_recommended ? "Human review" : "Self-serve";
+  elements.missingInfo.textContent = (data.missing_information || []).join(", ");
+  elements.products.textContent = (data.recommended_products || []).map((product) => product.name).join(", ");
+  elements.sources.textContent = [
+    ...(data.code_references || []),
+    ...(data.knowledge_references || [])
+  ].map((source) => source.title).join(", ");
 }
 
 async function sendMessage(message) {
@@ -181,12 +137,12 @@ elements.resetButton.addEventListener("click", () => {
   elements.confidence.textContent = "-";
   elements.leadState.textContent = "Not needed";
   elements.intent.textContent = "Intent";
-  elements.flags.replaceChildren();
-  elements.missingInfo.replaceChildren();
-  elements.products.replaceChildren();
-  elements.sources.replaceChildren();
+  elements.flags.textContent = "";
+  elements.missingInfo.textContent = "";
+  elements.products.textContent = "";
+  elements.sources.textContent = "";
   elements.messages.replaceChildren();
-  appendMessage("assistant", "New session ready. Ask a DoorIQ question.");
+  appendMessage("assistant", "Hi, how can I help you?");
 });
 
 prompts.forEach((prompt) => {

@@ -11,7 +11,8 @@ def test_frontend_serves_chat_ui() -> None:
 
     assert response.status_code == 200
     assert "DoorIQ" in response.text
-    assert "Chat Test" in response.text
+    assert "Project details" in response.text
+    assert "details-panel" not in response.text
 
 
 def test_frontend_static_assets_load() -> None:
@@ -20,5 +21,8 @@ def test_frontend_static_assets_load() -> None:
 
     assert script_response.status_code == 200
     assert "fetch(\"/chat\"" in script_response.text
+    assert "recommended_products" in script_response.text
+    assert "appendTextWithLinks" in script_response.text
     assert style_response.status_code == 200
-    assert ".workspace" in style_response.text
+    assert ".chat-card" in style_response.text
+    assert ".message a" in style_response.text

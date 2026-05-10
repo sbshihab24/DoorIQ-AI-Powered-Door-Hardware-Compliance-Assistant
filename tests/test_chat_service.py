@@ -23,7 +23,8 @@ def test_build_chat_response_includes_detected_intent() -> None:
     response = build_chat_response(request)
 
     assert response.intent == "access_control"
-    assert response.code_references[0].section == "access control"
+    assert response.code_references
+    assert response.code_references[0].summary
     assert response.requirements
     assert response.allowed_options
     assert response.risky_or_not_allowed
@@ -52,6 +53,21 @@ def test_build_chat_response_includes_local_review_when_state_is_known() -> None
     assert response.code_references[0].title == "TX Local Code Review"
 
 
+def test_build_chat_response_includes_zip_code_verification_packet() -> None:
+    request = ChatRequest(
+        message="Can I use a maglock on this egress door?",
+        building={"application": "egress door", "is_egress_path": True},
+        location={"state": "TX", "zip_code": "77002"},
+    )
+
+    response = build_chat_response(request)
+
+    assert response.code_references[0].title == "TX / 77002 Code Verification Packet"
+    assert response.code_references[0].url == "https://codes.iccsafe.org/"
+    assert "not as final legal text" in response.code_references[0].summary
+    assert "last_verified_utc" in response.code_references[0].summary
+
+
 def test_build_chat_response_flags_lead_capture_for_quote_request() -> None:
     request = ChatRequest(message="Can I get pricing for this egress hardware?")
 
@@ -73,12 +89,56 @@ def test_build_chat_response_handles_dataset_product_match_case() -> None:
     product_reasons = [product.reason for product in response.recommended_products]
     assert response.intent == "product_match"
     assert "KD Masonry Frame" in product_names
+    masonry_frame = next(
+        product
+        for product in response.recommended_products
+        if product.name == "KD Masonry Frame"
+    )
+    assert masonry_frame.starting_price_usd == 160
+    assert masonry_frame.fire_rating == "Up to 3 hours"
     assert any("Matches the requested product category" in reason for reason in product_reasons)
     assert response.missing_information == [
         "hardware_type",
         "finish",
         "rating",
         "brand_preference",
+    ]
+
+
+def test_build_chat_response_handles_office_door_request_as_door_recommendation() -> None:
+    response = build_chat_response(
+        ChatRequest(
+            message="I need a door for my office",
+            building={"building_type": "office", "application": "office"},
+        )
+    )
+
+    assert response.intent == "door_type_recommendation"
+    assert "Dataset-grounded starting point for an office" in response.answer
+    assert "Product Recommendation Conditions" in [
+        reference.title for reference in response.knowledge_references
+    ]
+    assert "Seed QA: What doors and hardware are required for a hospital main entrance" not in [
+        reference.title for reference in response.knowledge_references
+    ]
+    assert "Hospital Main Entrance Seed Case" not in [
+        reference.title for reference in response.knowledge_references
+    ]
+    assert "Seed QA: Can I use a magnetic lock on this type of door" not in [
+        reference.title for reference in response.knowledge_references
+    ]
+    assert "Commercial Wood Door with Glass" in [
+        product.name for product in response.recommended_products
+    ]
+
+
+def test_build_chat_response_does_not_recommend_products_for_generic_kitchen_door() -> None:
+    response = build_chat_response(ChatRequest(message="i need a door for my kitchen"))
+
+    assert response.intent == "door_type_recommendation"
+    assert response.recommended_products == []
+    assert "Product Recommendation Conditions" in [
+        reference.title for reference in response.knowledge_references
     ]
 
 
@@ -92,7 +152,11 @@ def test_build_chat_response_handles_automatic_operator_case() -> None:
     response = build_chat_response(request)
 
     assert response.intent == "automatic_operator_recommendation"
-    assert "Automatic Door Operator" in [
+    assert any(
+        "low-energy" in option and "full-power" in option
+        for option in response.allowed_options
+    )
+    assert "Automatic Door Operator" not in [
         product.name for product in response.recommended_products
     ]
     assert response.missing_information == [
@@ -135,14 +199,14 @@ def test_build_chat_response_uses_medium_confidence_for_complete_context() -> No
     response = build_chat_response(request)
 
     assert response.confidence == "low"
-    assert response.human_review_recommended is False
+    assert response.human_review_recommended is True
 
 
 def test_build_chat_response_handles_greeting_without_door_pipeline() -> None:
     response = build_chat_response(ChatRequest(message="Hi"))
 
     assert response.intent == "greeting"
-    assert "DoorIQ" in response.answer
+    assert response.answer == "Hi, how can I help you?"
     assert response.missing_information == []
     assert response.recommended_products == []
     assert response.should_capture_lead is False

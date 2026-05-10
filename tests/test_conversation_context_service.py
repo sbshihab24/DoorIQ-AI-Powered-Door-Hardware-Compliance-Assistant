@@ -51,3 +51,29 @@ def test_merge_conversation_context_uses_saved_session(db_session: Session) -> N
     assert merged_request.location is not None
     assert merged_request.location.state == "TX"
     assert merged_request.location.zip_code == "77002"
+
+
+def test_merge_conversation_context_treats_rating_as_context_update(
+    db_session: Session,
+) -> None:
+    db_session.add(
+        ChatSession(
+            id="session-school",
+            building_type="school",
+            application="corridor opening",
+        )
+    )
+    db_session.commit()
+
+    request = ChatRequest(
+        session_id="session-school",
+        message="fire rating of 60 mins",
+    )
+
+    merged_request = merge_conversation_context(db_session, request)
+
+    assert "fire rating of 60 mins" in merged_request.message
+    assert merged_request.building is not None
+    assert merged_request.building.building_type == "school"
+    assert merged_request.building.application == "corridor opening"
+    assert merged_request.building.fire_rating_required is True

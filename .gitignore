@@ -14,7 +14,6 @@ coverage.xml
 
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
 
 DoorIQ AI-Powered Door & Hardware Compliance Assistant__ solution_sqd __ Ariful.pdf
@@ -33,3 +32,7 @@ PROJECT_PLAN.md
 *.sqlite-*
 *.db
 *.db-*
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore

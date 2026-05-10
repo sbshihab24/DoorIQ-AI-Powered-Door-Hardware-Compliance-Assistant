@@ -1,106 +1,28 @@
 from __future__ import annotations
 
-import re
-
 from sqlalchemy.orm import Session
 
 from app.db.models import ChatMessage, ChatSession
 from app.schemas.chat import ChatRequest
 from app.schemas.common import BuildingContext, LocationInput
 from app.services.intent_service import detect_intent
-
-
-STATE_NAMES = {
-    "texas": "TX",
-    "tx": "TX",
-    "california": "CA",
-    "ca": "CA",
-    "florida": "FL",
-    "fl": "FL",
-    "new york": "NY",
-    "ny": "NY",
-}
-
-BUILDING_KEYWORDS = {
-    "hospital": "hospital",
-    "clinic": "healthcare",
-    "healthcare": "healthcare",
-    "memory care": "healthcare",
-    "school": "school",
-    "office": "office",
-    "warehouse": "warehouse",
-}
-
-
-def _first_zip_code(text: str) -> str | None:
-    match = re.search(r"\b\d{5}(?:-\d{4})?\b", text)
-    return match.group(0) if match else None
-
-
-def _state_from_text(text: str) -> str | None:
-    normalized_text = text.lower()
-    for keyword, state_code in STATE_NAMES.items():
-        if re.search(rf"\b{re.escape(keyword)}\b", normalized_text):
-            return state_code
-
-    return None
-
-
-def _building_type_from_text(text: str) -> str | None:
-    normalized_text = text.lower()
-    for keyword, building_type in BUILDING_KEYWORDS.items():
-        if keyword in normalized_text:
-            return building_type
-
-    return None
-
-
-def _application_from_text(text: str) -> str | None:
-    normalized_text = text.lower()
-
-    if "masonry" in normalized_text and "frame" in normalized_text:
-        return "masonry opening frame"
-    if "main entrance" in normalized_text:
-        return "main entrance"
-    if "hospital" in normalized_text and "corridor" in normalized_text:
-        return "hospital corridor"
-    if "corridor" in normalized_text:
-        return "corridor opening"
-    if "patient room" in normalized_text:
-        return "patient room"
-    if "restroom" in normalized_text:
-        return "restroom"
-    if "egress" in normalized_text or "exit door" in normalized_text:
-        return "egress door"
-    if "rated opening" in normalized_text:
-        return "rated opening"
-
-    return None
+from app.services.project_facts_service import extract_project_facts
 
 
 def infer_request_context(message: str) -> ChatRequest:
-    normalized_message = message.lower()
+    facts = extract_project_facts(ChatRequest(message=message))
     building = BuildingContext(
-        building_type=_building_type_from_text(message),
-        application=_application_from_text(message),
-        is_new_construction=True
-        if "new construction" in normalized_message or "new work" in normalized_message
-        else False
-        if "existing" in normalized_message or "renovation" in normalized_message
-        else None,
-        is_egress_path=True
-        if any(term in normalized_message for term in ["egress", "exit path", "exit door"])
-        else None,
-        fire_rating_required=True
-        if any(term in normalized_message for term in ["fire-rated", "fire rated", "rated", "fire rating"])
-        else None,
-        accessibility_required=True
-        if any(term in normalized_message for term in ["ada", "accessible", "handicap"])
-        else None,
+        building_type=facts.building_type,
+        application=facts.application,
+        is_new_construction=facts.new_vs_existing,
+        is_egress_path=facts.is_egress_path,
+        fire_rating_required=facts.rating_required,
+        accessibility_required=facts.accessibility_required,
     )
     location = LocationInput(
-        state=_state_from_text(message),
-        zip_code=_first_zip_code(message),
+        state=facts.state,
+        zip_code=facts.zip_code,
+        city=facts.city,
     )
 
     return ChatRequest(message=message, building=building, location=location)
@@ -227,27 +149,85 @@ def _latest_non_general_user_message(db: Session, session_id: str) -> str | None
     return None
 
 
+def _recent_user_context(db: Session, session_id: str) -> str | None:
+    messages = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.session_id == session_id, ChatMessage.role == "user")
+        .order_by(ChatMessage.id.desc())
+        .limit(6)
+        .all()
+    )
+    ordered_messages = [
+        message.content.strip()
+        for message in reversed(messages)
+        if message.content.strip()
+    ]
+    return " ".join(ordered_messages) if ordered_messages else None
+
+
 def _looks_like_context_update(message: str) -> bool:
     normalized_message = message.strip().lower()
     return (
         normalized_message.startswith(("it is", "it's", "this is", "that is"))
         or normalized_message.startswith(("yes", "no"))
         or " zip " in f" {normalized_message} "
+        or any(
+            term in normalized_message
+            for term in [
+                "interior",
+                "exterior",
+                "fire rating",
+                "fire rate",
+                "fire-rated",
+                "fire rated",
+                "rated",
+                "mins",
+                "minutes",
+                "min",
+                "light",
+                "normal",
+                "high traffic",
+                "heavy traffic",
+                "wood",
+                "hollow metal",
+                "metal",
+                "aluminum",
+                "storefront",
+                "wall",
+                "barrier",
+                "corridor wall",
+                "smoke barrier",
+                "fire barrier",
+                "stair enclosure",
+            ]
+        )
     ) and "?" not in normalized_message
 
 
 def merge_conversation_context(db: Session, request: ChatRequest) -> ChatRequest:
     session = db.get(ChatSession, request.session_id) if request.session_id else None
-    inferred = infer_request_context(request.message)
 
     message_for_response = request.message
-    if request.session_id and (
-        detect_intent(request.message) == "general"
-        or _looks_like_context_update(request.message)
-    ):
-        previous_message = _latest_non_general_user_message(db, request.session_id)
-        if previous_message:
-            message_for_response = f"{previous_message} {request.message}"
+    is_context_update = _looks_like_context_update(request.message)
+    current_intent = detect_intent(request.message)
+    if request.session_id and is_context_update:
+        previous_context = _recent_user_context(db, request.session_id)
+        if previous_context:
+            message_for_response = f"{previous_context} {request.message}"
+    elif request.session_id and current_intent in {"product_match", "quote_handoff"}:
+        previous_context = _recent_user_context(db, request.session_id)
+        if previous_context:
+            message_for_response = f"{previous_context} {request.message}"
+    elif request.session_id and current_intent == "general":
+        previous_context = _recent_user_context(db, request.session_id)
+        if previous_context:
+            message_for_response = f"{previous_context} {request.message}"
+    elif request.session_id and current_intent not in {"greeting", "out_of_scope"}:
+        previous_context = _recent_user_context(db, request.session_id)
+        if previous_context:
+            message_for_response = f"{previous_context} {request.message}"
+
+    inferred = infer_request_context(message_for_response)
 
     return ChatRequest(
         session_id=request.session_id,
