@@ -22,6 +22,8 @@ class ChatSession(Base):
     accessibility_required: Mapped[bool | None] = mapped_column(nullable=True)
     email: Mapped[str | None] = mapped_column(nullable=True)
     phone: Mapped[str | None] = mapped_column(nullable=True)
+    lead_name: Mapped[str | None] = mapped_column(nullable=True)
+    project_context: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -68,8 +70,8 @@ class Lead(Base):
         ForeignKey("chat_sessions.id", ondelete="CASCADE"),
         index=True,
     )
-    email: Mapped[str] = mapped_column()
-    phone: Mapped[str] = mapped_column()
+    email: Mapped[str | None] = mapped_column(nullable=True)
+    phone: Mapped[str | None] = mapped_column(nullable=True)
     name: Mapped[str | None] = mapped_column(nullable=True)
     project_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

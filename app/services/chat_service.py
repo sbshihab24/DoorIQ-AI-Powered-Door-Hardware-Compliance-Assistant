@@ -11,12 +11,13 @@ from app.schemas.chat import (
     RecommendedProduct,
 )
 from app.services.answer_service import build_answer
+from app.services.chat_extraction_service import ChatExtraction, extract_chat_details
 from app.services.code_service import find_code_references
 from app.services.conversation_context_service import merge_conversation_context
 from app.services.guidance_service import get_guidance_for_intent
 from app.services.intent_service import detect_intent, normalize_intent
+from app.services.local_code_service import build_local_code_references
 from app.services.lead_service import (
-    apply_contact_details_to_session,
     create_lead_from_session_if_ready,
     get_lead_capture_status,
     should_capture_lead,
@@ -26,9 +27,9 @@ from app.services.product_service import (
     find_products_for_application,
     get_product_match_reason,
 )
+from app.services.project_facts_service import extract_project_facts
 from app.services.retrieval_service import find_relevant_knowledge
 from app.services.retrieval_service import find_relevant_knowledge_from_db
-from app.services.seed_qa_service import find_seed_qa_for_question
 
 
 def get_missing_information(request: ChatRequest, intent: str = "general") -> list[str]:
@@ -80,10 +81,18 @@ def should_recommend_human_review(
     missing_information: list[str],
     confidence: str,
 ) -> bool:
-    seed_qa = find_seed_qa_for_question(request.message)
-    if seed_qa is not None:
-        return bool(seed_qa.get("escalate_to_human"))
-
+    normalized_message = request.message.lower()
+    safety_terms = [
+        "delayed egress",
+        "maglock",
+        "magnetic lock",
+        "fire-rated",
+        "fire rated",
+        "memory care",
+        "lockdown",
+    ]
+    if any(term in normalized_message for term in safety_terms):
+        return True
     return bool(missing_information) or confidence != "medium"
 
 
@@ -94,11 +103,7 @@ def _build_special_chat_response(
     db: Session | None = None,
 ) -> ChatResponse | None:
     if intent == "greeting":
-        answer = (
-            "Hi, I am DoorIQ. Ask me about commercial doors, frames, hardware, "
-            "ADA/accessibility, fire ratings, egress, maglocks, automatic operators, "
-            "or product matches from the United Doors & Hardware catalog."
-        )
+        answer = "Hi, how can I help you?"
     elif intent == "out_of_scope":
         answer = (
             "I am focused on commercial doors, frames, hardware, accessibility, "
@@ -136,20 +141,34 @@ def build_chat_response(request: ChatRequest, db: Session | None = None) -> Chat
         return special_response
 
     normalized_intent = normalize_intent(intent)
+    facts = extract_project_facts(request)
     guidance = get_guidance_for_intent(normalized_intent)
-    application = request.building.application if request.building else None
-    state = request.location.state if request.location else None
+    application = facts.application
+    state = facts.state
     product_query = " ".join(
         query_part
-        for query_part in [application, request.message, normalized_intent]
+        for query_part in [
+            application,
+            request.message,
+            "fire rated" if facts.rating_required or facts.rating_minutes else "",
+            f"{facts.material_preference} door" if facts.material_preference else "",
+            facts.hardware_type or "",
+            normalized_intent,
+        ]
         if query_part
     )
+    if normalized_intent == "door_type_recommendation" and not facts.building_type:
+        product_query = request.message
     products = find_products_for_application(product_query)
     recommended_products = [
         RecommendedProduct(
             name=product.name,
             category=product.category,
             reason=get_product_match_reason(product, product_query),
+            source_url=product.source_url,
+            starting_price_usd=product.starting_price_usd,
+            fire_rating=product.fire_rating,
+            notes=product.notes,
         )
         for product in products
     ]
@@ -160,7 +179,10 @@ def build_chat_response(request: ChatRequest, db: Session | None = None) -> Chat
             url=code_reference.url,
             summary=code_reference.content,
         )
-        for code_reference in find_code_references(normalized_intent, state)
+        for code_reference in [
+            *build_local_code_references(request, normalized_intent),
+            *find_code_references(normalized_intent, state),
+        ]
     ]
     if db is not None:
         relevant_knowledge = find_relevant_knowledge_from_db(
@@ -187,20 +209,32 @@ def build_chat_response(request: ChatRequest, db: Session | None = None) -> Chat
         knowledge_references=knowledge_references,
     )
 
+    human_review_recommended = should_recommend_human_review(
+        request,
+        missing_information,
+        confidence,
+    )
+    answer = build_answer(
+        request=request,
+        intent=intent,
+        requirements=guidance.requirements,
+        allowed_options=guidance.allowed_options,
+        risky_or_not_allowed=guidance.risky_or_not_allowed,
+        recommended_products=recommended_products,
+        code_references=code_references,
+        knowledge_references=knowledge_references,
+        missing_information=missing_information,
+    )
+    if human_review_recommended and should_capture_lead(request):
+        answer = (
+            f"{answer}\n\nHuman assistance:\n"
+            "- Share email and phone if you want someone to review this opening."
+        )
+
     return ChatResponse(
         session_id=session_id,
         intent=intent,
-        answer=build_answer(
-            request=request,
-            intent=intent,
-            requirements=guidance.requirements,
-            allowed_options=guidance.allowed_options,
-            risky_or_not_allowed=guidance.risky_or_not_allowed,
-            recommended_products=recommended_products,
-            code_references=code_references,
-            knowledge_references=knowledge_references,
-            missing_information=missing_information,
-        ),
+        answer=answer,
         requirements=guidance.requirements,
         allowed_options=guidance.allowed_options,
         risky_or_not_allowed=guidance.risky_or_not_allowed,
@@ -213,11 +247,7 @@ def build_chat_response(request: ChatRequest, db: Session | None = None) -> Chat
             db.get(ChatSession, session_id) if db is not None else None
         ),
         confidence=confidence,
-        human_review_recommended=should_recommend_human_review(
-            request,
-            missing_information,
-            confidence,
-        ),
+        human_review_recommended=human_review_recommended,
     )
 
 
@@ -255,6 +285,68 @@ def get_or_create_chat_session(db: Session, request: ChatRequest, session_id: st
     return chat_session
 
 
+def _recent_user_messages(db: Session, session_id: str, current_message: str) -> list[str]:
+    messages = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.session_id == session_id, ChatMessage.role == "user")
+        .order_by(ChatMessage.id.desc())
+        .limit(12)
+        .all()
+    )
+    recent_messages = [
+        message.content.strip()
+        for message in reversed(messages)
+        if message.content.strip()
+    ]
+    if current_message.strip():
+        recent_messages.append(current_message.strip())
+    return recent_messages
+
+
+def _merge_project_context(
+    existing_context: dict | None,
+    extracted_context: dict,
+) -> dict:
+    merged_context = dict(existing_context or {})
+    for key, value in extracted_context.items():
+        if value is not None and value != "":
+            merged_context[key] = value
+    return merged_context
+
+
+def _apply_extraction_to_session(
+    chat_session: ChatSession,
+    extraction: ChatExtraction,
+) -> None:
+    if extraction.email:
+        chat_session.email = extraction.email
+    if extraction.phone:
+        chat_session.phone = extraction.phone
+    if extraction.name:
+        chat_session.lead_name = extraction.name
+
+    chat_session.project_context = _merge_project_context(
+        chat_session.project_context,
+        extraction.project_context,
+    )
+
+    context = chat_session.project_context or {}
+    chat_session.building_type = context.get("building_type") or chat_session.building_type
+    chat_session.application = context.get("application") or chat_session.application
+    chat_session.state = context.get("state") or chat_session.state
+    chat_session.zip_code = context.get("zip_code") or chat_session.zip_code
+    chat_session.city = context.get("city") or chat_session.city
+    for field_name in [
+        "is_new_construction",
+        "is_egress_path",
+        "fire_rating_required",
+        "accessibility_required",
+    ]:
+        context_value = context.get(field_name)
+        if context_value is not None:
+            setattr(chat_session, field_name, context_value)
+
+
 def save_chat_exchange(
     db: Session,
     request: ChatRequest,
@@ -266,14 +358,33 @@ def save_chat_exchange(
         context_request or request,
         response.session_id,
     )
-    apply_contact_details_to_session(chat_session, request.message)
+    extraction = extract_chat_details(
+        _recent_user_messages(db, response.session_id, request.message)
+    )
+    _apply_extraction_to_session(chat_session, extraction)
+    if extraction.wants_follow_up or chat_session.email or chat_session.phone:
+        response.should_capture_lead = True
     lead_created = False
-    if should_capture_lead(context_request or request):
+    if (
+        should_capture_lead(context_request or request)
+        or extraction.wants_follow_up
+        or bool(chat_session.email or chat_session.phone)
+    ):
         lead_created = create_lead_from_session_if_ready(
             db,
             chat_session,
-            project_notes=request.message,
+            project_notes=extraction.project_notes or request.message,
         )
+        if lead_created and "Human assistance:" not in response.answer:
+            response.answer = (
+                f"{response.answer}\n\nHuman assistance:\n"
+                "- Your contact details were saved for follow-up."
+            )
+        elif lead_created:
+            response.answer = (
+                f"{response.answer}\n"
+                "- Your contact details were saved for follow-up."
+            )
 
     response.lead_capture_status.email_collected = bool(chat_session.email)
     response.lead_capture_status.phone_collected = bool(chat_session.phone)

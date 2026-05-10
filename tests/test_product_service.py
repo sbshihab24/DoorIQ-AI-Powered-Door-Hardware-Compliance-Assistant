@@ -8,12 +8,16 @@ def test_find_products_for_egress_application() -> None:
     products = find_products_for_application("egress door")
 
     product_names = [product.name for product in products]
-    assert "Rim Exit Device" in product_names
-    assert "Surface Door Closer" in product_names
+    assert "8300A Heavy Duty Rim Device 48 Inch" in product_names
+    assert "600 Series Heavy Duty Door Closer" in product_names
 
 
 def test_find_products_returns_empty_list_without_application() -> None:
     assert find_products_for_application(None) == []
+
+
+def test_find_products_does_not_match_on_generic_door_request() -> None:
+    assert find_products_for_application("i need a door for my kitchen door_type_recommendation") == []
 
 
 def test_find_products_for_masonry_frame_application() -> None:
@@ -21,6 +25,10 @@ def test_find_products_for_masonry_frame_application() -> None:
 
     product_names = [product.name for product in products]
     assert "KD Masonry Frame" in product_names
+    masonry_frame = next(product for product in products if product.name == "KD Masonry Frame")
+    assert masonry_frame.starting_price_usd == 160
+    assert masonry_frame.fire_rating == "Up to 3 hours"
+    assert masonry_frame.source_url == "https://uniteddoorsandlocks.com/products/kd-masonry-frame"
 
 
 def test_find_products_for_hospital_corridor_application() -> None:

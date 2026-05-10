@@ -14,6 +14,10 @@ class RecommendedProduct(BaseModel):
     name: str
     category: str
     reason: str
+    source_url: str | None = None
+    starting_price_usd: float | None = None
+    fire_rating: str | None = None
+    notes: str | None = None
 
 
 class CodeReference(BaseModel):

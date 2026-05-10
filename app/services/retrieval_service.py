@@ -8,6 +8,20 @@ from app.services.data_loader import load_processed_json
 from app.services.embedding_service import cosine_similarity, embed_text
 
 
+GENERIC_RETRIEVAL_TOKENS = {
+    "and",
+    "door",
+    "doors",
+    "for",
+    "need",
+    "needs",
+    "recommendation",
+    "type",
+    "what",
+    "with",
+}
+
+
 @dataclass(frozen=True)
 class KnowledgeSnippet:
     title: str
@@ -27,7 +41,7 @@ def _tokenize(text: str) -> set[str]:
     return {
         token
         for token in re.findall(r"[a-z0-9]+", text.lower())
-        if len(token) > 2
+        if len(token) > 2 and token not in GENERIC_RETRIEVAL_TOKENS
     }
 
 
@@ -51,19 +65,20 @@ def find_relevant_knowledge(query: str, intent: str | None = None, limit: int = 
 
     scored_snippets.sort(key=lambda item: item[0], reverse=True)
     snippets = [snippet for _, snippet in scored_snippets]
+    snippets = _filter_context_mismatched_seed_snippets(snippets, query_tokens, intent)
 
     if intent == "applicable_code_lookup":
         required_titles = [
             "Dataset Implementation Note",
             "ZIP-Based Local Code Resolution",
         ]
-        pinned_snippets = [
-            snippet
-            for title in required_titles
-            for snippet in get_knowledge_base()
-            if snippet.title == title and snippet not in snippets[:limit]
+        snippets = _pin_titles(snippets, required_titles)
+
+    if intent == "door_type_recommendation":
+        required_titles = [
+            "Product Recommendation Conditions",
         ]
-        snippets = pinned_snippets + snippets
+        snippets = _pin_titles(snippets, required_titles)
 
     deduplicated_snippets = []
     seen_titles = set()
@@ -82,6 +97,7 @@ def find_relevant_knowledge_from_db(
     intent: str | None = None,
     limit: int = 3,
 ) -> list[KnowledgeSnippet]:
+    query_tokens = _tokenize(query)
     query_embedding = embed_text(" ".join(part for part in [query, intent or ""] if part))
     if db.bind is not None and db.bind.dialect.name == "postgresql":
         chunks = (
@@ -101,7 +117,7 @@ def find_relevant_knowledge_from_db(
                 )
                 for chunk in chunks
             ]
-            return _with_applicable_code_pins(snippets, limit, intent)
+            return _with_applicable_code_pins(snippets, limit, intent, query_tokens)
 
     chunks = db.query(DocumentChunk).all()
     scored_chunks: list[tuple[float, DocumentChunk]] = []
@@ -128,25 +144,79 @@ def find_relevant_knowledge_from_db(
         for _, chunk in scored_chunks[:limit]
     ]
 
-    return _with_applicable_code_pins(snippets, limit, intent)
+    return _with_applicable_code_pins(snippets, limit, intent, query_tokens)
 
 
 def _with_applicable_code_pins(
     snippets: list[KnowledgeSnippet],
     limit: int,
     intent: str | None = None,
+    query_tokens: set[str] | None = None,
 ) -> list[KnowledgeSnippet]:
+    snippets = _filter_context_mismatched_seed_snippets(
+        snippets,
+        query_tokens or set(),
+        intent,
+    )
     if intent != "applicable_code_lookup":
+        if intent == "door_type_recommendation":
+            return _pin_titles(snippets, ["Product Recommendation Conditions"])[:limit]
+
         return snippets[:limit]
 
-    pinned_titles = {
-        "Dataset Implementation Note",
-        "ZIP-Based Local Code Resolution",
-    }
-    existing_titles = {snippet.title for snippet in snippets}
-    fallback_pins = [
+    return _pin_titles(
+        snippets,
+        ["Dataset Implementation Note", "ZIP-Based Local Code Resolution"],
+    )[:limit]
+
+
+def _pin_titles(snippets: list[KnowledgeSnippet], titles: list[str]) -> list[KnowledgeSnippet]:
+    knowledge_base = get_knowledge_base()
+    pinned_snippets = [
         snippet
-        for snippet in get_knowledge_base()
-        if snippet.title in pinned_titles and snippet.title not in existing_titles
+        for title in titles
+        for snippet in knowledge_base
+        if snippet.title == title
     ]
-    return (fallback_pins + snippets)[:limit]
+    pinned_titles = {snippet.title for snippet in pinned_snippets}
+    remaining_snippets = [
+        snippet for snippet in snippets if snippet.title not in pinned_titles
+    ]
+    return pinned_snippets + remaining_snippets
+
+
+def _filter_context_mismatched_seed_snippets(
+    snippets: list[KnowledgeSnippet],
+    query_tokens: set[str],
+    intent: str | None,
+) -> list[KnowledgeSnippet]:
+    if not query_tokens:
+        return snippets
+
+    specific_context_tags = {"hospital", "school", "healthcare", "memory care"}
+    filtered_snippets = []
+    for snippet in snippets:
+        snippet_tags = {tag.lower() for tag in snippet.tags}
+        snippet_tag_tokens = set()
+        for tag in snippet_tags:
+            snippet_tag_tokens.update(_tokenize(tag))
+
+        if (
+            snippet_tags & specific_context_tags
+            and not snippet_tags & query_tokens
+            and not snippet_tag_tokens & query_tokens
+        ):
+            continue
+
+        is_seed_snippet = snippet.title.startswith("Seed QA:") or snippet.title.endswith("Seed Case")
+        if not is_seed_snippet:
+            filtered_snippets.append(snippet)
+            continue
+
+        if intent and intent not in snippet_tags:
+            continue
+
+        if "general" in snippet_tags or snippet_tags & query_tokens or snippet_tag_tokens & query_tokens:
+            filtered_snippets.append(snippet)
+
+    return filtered_snippets

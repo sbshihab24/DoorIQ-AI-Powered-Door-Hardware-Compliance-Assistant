@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from app.db.models import ChatSession, Lead
 from app.schemas.chat import ChatRequest
 from app.schemas.chat import LeadCaptureStatus
-from app.services.seed_qa_service import find_seed_qa_for_question
 
 
 LEAD_CAPTURE_KEYWORDS = [
@@ -20,10 +19,6 @@ LEAD_CAPTURE_KEYWORDS = [
 
 
 def should_capture_lead(request: ChatRequest) -> bool:
-    seed_qa = find_seed_qa_for_question(request.message)
-    if seed_qa is not None:
-        return bool(seed_qa.get("need_email_phone"))
-
     normalized_message = request.message.lower()
 
     if any(keyword in normalized_message for keyword in LEAD_CAPTURE_KEYWORDS):
@@ -84,19 +79,21 @@ def create_lead_from_session_if_ready(
     chat_session: ChatSession,
     project_notes: str | None = None,
 ) -> bool:
-    if not chat_session.email or not chat_session.phone:
+    if not chat_session.email and not chat_session.phone:
         return False
 
-    existing_lead = (
-        db.query(Lead)
-        .filter(
-            Lead.session_id == chat_session.id,
-            Lead.email == chat_session.email,
-            Lead.phone == chat_session.phone,
-        )
-        .first()
-    )
+    query = db.query(Lead).filter(Lead.session_id == chat_session.id)
+    if chat_session.email:
+        query = query.filter(Lead.email == chat_session.email)
+    if chat_session.phone:
+        query = query.filter(Lead.phone == chat_session.phone)
+
+    existing_lead = query.first()
     if existing_lead is not None:
+        if chat_session.lead_name and not existing_lead.name:
+            existing_lead.name = chat_session.lead_name
+        if project_notes and not existing_lead.project_notes:
+            existing_lead.project_notes = project_notes
         return False
 
     db.add(
@@ -104,6 +101,7 @@ def create_lead_from_session_if_ready(
             session_id=chat_session.id,
             email=chat_session.email,
             phone=chat_session.phone,
+            name=chat_session.lead_name,
             project_notes=project_notes,
         )
     )

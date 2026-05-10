@@ -1,17 +1,45 @@
 # DoorIQ Chatbot
 
-Backend chatbot API and test frontend for United Doors & Hardware door, frame, hardware, product, and code-guidance questions.
+Backend chatbot API for United Doors & Hardware door, frame, hardware, product, and code-guidance questions. The included static page is only a local chatbot test harness.
 
 ## Local Python
+
+Create or review `.env`:
+
+```text
+APP_NAME=DoorIQ Chatbot API
+APP_ENV=development
+APP_DEBUG=true
+DATABASE_URL=sqlite:///./dooriq_local.db
+OPENAI_API_KEY=
+OPENAI_CHAT_MODEL=gpt-4.1-mini
+EMBEDDING_MODEL=text-embedding-3-small
+GROQ_API_KEY=
+GROQ_CHAT_MODEL=llama-3.3-70b-versatile
+LOCAL_EMBEDDING_DIMENSIONS=128
+```
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-Run the API against the Docker pgvector database:
+Initialize or migrate the local SQLite database:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\init_local_db.py
+```
+
+Run the API against local SQLite:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8765
+```
+
+Run the API against the Docker pgvector PostgreSQL database:
 
 ```powershell
 $env:DATABASE_URL="postgresql+psycopg://dooriq:dooriq_password@localhost:5433/dooriq"
+.\.venv\Scripts\python.exe -m alembic upgrade head
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8765
 ```
 
@@ -36,6 +64,19 @@ http://127.0.0.1:8766/
 ```
 
 The database is exposed on host port `5433` and container port `5432`.
+
+## Database Modes
+
+- SQLite is supported for tests and lightweight local development: `DATABASE_URL=sqlite:///./dooriq_local.db`.
+- PostgreSQL with pgvector is the production target: `DATABASE_URL=postgresql+psycopg://...`.
+- Always run `alembic upgrade head` before starting the production app.
+- Use `scripts/init_local_db.py` for local SQLite so Alembic versioning stays in sync.
+
+## Chatbot Data Boundary
+
+DoorIQ answers are grounded in the processed dataset generated from `united_doors_ai_training_dataset.pdf`. The dataset says local-code precision requires ZIP, state, city/county/jurisdiction, adopted building code, fire code, accessibility code, amendment URL, AHJ contact when available, and last verification timestamp. Without those fields, exact code-section answers stay conditional.
+
+Product recommendations use the dataset product fields only: name, category, compatible applications, fire rating, starting price, source URL when present, and notes.
 
 ## LLM Providers
 
@@ -67,7 +108,7 @@ https://api.groq.com/openai/v1
 The processed dataset is generated from:
 
 ```text
-C:\bryan\united_doors_ai_training_dataset.pdf
+united_doors_ai_training_dataset.pdf
 ```
 
 Regenerate processed JSON and ingest vector chunks into Postgres:

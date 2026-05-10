@@ -1,0 +1,234 @@
+[
+  {
+    "division": "08",
+    "section": "08 10 00",
+    "title": "Doors and Frames",
+    "door_ai_relevance": "Core",
+    "notes": "Primary spec bucket for door and frame systems.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 11 00",
+    "title": "Metal Doors and Frames",
+    "door_ai_relevance": "Core",
+    "notes": "Steel frames and metal door assemblies.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 11 16",
+    "title": "Aluminum Doors and Frames",
+    "door_ai_relevance": "Core",
+    "notes": "Aluminum framed door systems.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 13 00",
+    "title": "Metal Doors",
+    "door_ai_relevance": "Core",
+    "notes": "Metal doors separated from frame-specific sections.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 16 13",
+    "title": "Fiberglass Doors",
+    "door_ai_relevance": "Related",
+    "notes": "Alternate exterior/interior door material type.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 31 00",
+    "title": "Access Doors and Panels",
+    "door_ai_relevance": "Related",
+    "notes": "Service access panels, not primary passage doors.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 32 13",
+    "title": "Sliding Aluminum-Framed Glass Doors",
+    "door_ai_relevance": "Core",
+    "notes": "Sliding door logic and accessibility/egress questions.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 33 00",
+    "title": "Coiling Doors and Grilles",
+    "door_ai_relevance": "Related",
+    "notes": "Rolling/coiling openings; often commercial back-of-house.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 34 00",
+    "title": "Special Function Doors",
+    "door_ai_relevance": "Core",
+    "notes": "Cleanroom, hydraulic, smoke curtain, specialty doors.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 34 73",
+    "title": "Sound Control Door Assemblies",
+    "door_ai_relevance": "Related",
+    "notes": "Acoustic openings; often institutional/education.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 35 00",
+    "title": "Folding Doors and Grilles",
+    "door_ai_relevance": "Related",
+    "notes": "Accordion and side-folding systems.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 41 00",
+    "title": "Entrances and Storefronts",
+    "door_ai_relevance": "Core",
+    "notes": "Public entrances/storefront openings.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 41 13",
+    "title": "Aluminum-Framed Entrances and Storefronts",
+    "door_ai_relevance": "Core",
+    "notes": "Typical commercial storefront entrance package.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 41 26",
+    "title": "All-Glass Entrances and Storefronts",
+    "door_ai_relevance": "Core",
+    "notes": "Glass entrance logic, hardware, accessibility.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 42 00",
+    "title": "Entrances",
+    "door_ai_relevance": "Core",
+    "notes": "Steel entrance door systems and related assemblies.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 71 00",
+    "title": "Door Hardware",
+    "door_ai_relevance": "Core",
+    "notes": "Locks, closers, hinges, exit devices, gasketing.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 71 13",
+    "title": "Automatic Door Operators",
+    "door_ai_relevance": "Core",
+    "notes": "Low-energy operators and automatic openers.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 81 00",
+    "title": "Glass Glazing",
+    "door_ai_relevance": "Related",
+    "notes": "Lite kits, fire-rated glazing, storefront glass.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "08",
+    "section": "08 88 00",
+    "title": "Special Function Glazing",
+    "door_ai_relevance": "Related",
+    "notes": "Fire/special glazing paired with door lites.",
+    "source_url": "https://www.arcat.com/content-type/spec/openings-08"
+  },
+  {
+    "division": "10",
+    "section": "10 1400",
+    "title": "Signage",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Affects accessible entrance signage and code wayfinding.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 1440",
+    "title": "Wayfinding",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Relevant when directing users to accessible entrances/egress routes.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 2154",
+    "title": "Healthcare Cubicle Curtains & Hardware",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Useful for hospital package recommendations but not door logic.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 2210",
+    "title": "Folding & Coiling Gates",
+    "door_ai_relevance": "Related",
+    "notes": "Can overlap with secure openings and ancillary closures.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 2230",
+    "title": "Operable Partitions",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Movable partition systems often discussed with school/hospital space separation.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 2830",
+    "title": "Grab Bars",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Accessibility specialty relevant to bathroom packages, not door logic itself.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 4400",
+    "title": "Fire Protection Specialties",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Fire/life-safety package context around openings.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 4600",
+    "title": "Luminous Egress Path Markings",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Egress-related specialty sometimes packaged with door/exit upgrades.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 5190",
+    "title": "Locks & Locker Room Accessories",
+    "door_ai_relevance": "Adjacent",
+    "notes": "Lock specialty; usually not opening hardware spec.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  },
+  {
+    "division": "10",
+    "section": "10 5784",
+    "title": "Closet Doors",
+    "door_ai_relevance": "Related",
+    "notes": "Residential-adjacent door category; lower priority for commercial bot.",
+    "source_url": "https://www.4specs.com/s/10.html"
+  }
+]

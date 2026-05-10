@@ -5,6 +5,23 @@ from app.services.data_loader import load_processed_json
 
 
 DEFAULT_PRODUCT_LIMIT = 5
+GENERIC_MATCH_TOKENS = {
+    "and",
+    "door",
+    "doors",
+    "for",
+    "need",
+    "needs",
+    "our",
+    "recommendation",
+    "that",
+    "the",
+    "this",
+    "type",
+    "with",
+    "your",
+}
+GENERIC_CATEGORY_BOOST_EXCLUSIONS = {"door"}
 
 
 def get_product_catalog() -> list[Product]:
@@ -23,7 +40,7 @@ def _tokenize(text: str) -> set[str]:
 
 
 def _score_product(query: str, product: Product) -> int:
-    query_tokens = _tokenize(query)
+    query_tokens = _tokenize(query) - GENERIC_MATCH_TOKENS
     product_text = " ".join(
         [
             product.name,
@@ -34,8 +51,12 @@ def _score_product(query: str, product: Product) -> int:
     )
     product_tokens = _tokenize(product_text)
     score = len(query_tokens & product_tokens)
+    product_category = product.category.lower()
 
-    if product.category.lower() in query:
+    if (
+        product_category not in GENERIC_CATEGORY_BOOST_EXCLUSIONS
+        and product_category in query
+    ):
         score += 3
 
     for compatible_application in product.compatible_applications:
@@ -53,7 +74,10 @@ def _score_product(query: str, product: Product) -> int:
 def get_product_match_reason(product: Product, query: str) -> str:
     normalized_query = query.lower()
 
-    if product.category.lower() in normalized_query:
+    if (
+        product.category.lower() not in GENERIC_CATEGORY_BOOST_EXCLUSIONS
+        and product.category.lower() in normalized_query
+    ):
         return f"Matches the requested product category: {product.category}."
 
     for compatible_application in product.compatible_applications:
@@ -62,7 +86,7 @@ def get_product_match_reason(product: Product, query: str) -> str:
         if normalized_compatible_application in normalized_query:
             return f"Matches the application: {compatible_application}."
 
-    query_tokens = _tokenize(normalized_query)
+    query_tokens = _tokenize(normalized_query) - GENERIC_MATCH_TOKENS
     product_tokens = _tokenize(
         " ".join(
             [

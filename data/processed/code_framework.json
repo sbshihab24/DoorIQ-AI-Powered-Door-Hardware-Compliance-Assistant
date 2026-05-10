@@ -64,6 +64,56 @@
     "source_url": "https://buildershardware.com/"
   },
   {
+    "source_or_code_family": "NFPA 80",
+    "type": "fire door standard",
+    "covers": "Fire doors, frames, hardware labels, modifications, inspections, self-closing, and positive latching.",
+    "typical_questions": [
+      "Can I change this rated door?",
+      "What hardware is allowed on a fire door?"
+    ],
+    "source_url": "https://codes.iccsafe.org/"
+  },
+  {
+    "source_or_code_family": "NFPA 101 Life Safety Code",
+    "type": "life safety standard",
+    "covers": "Healthcare, assembly, educational, and other occupancy egress requirements.",
+    "typical_questions": [
+      "Hospital corridor openings",
+      "School egress doors",
+      "Locking in healthcare units"
+    ],
+    "source_url": "https://codes.iccsafe.org/"
+  },
+  {
+    "source_or_code_family": "State building code adoption page",
+    "type": "jurisdiction source",
+    "covers": "Official adopted code edition and effective date.",
+    "typical_questions": [
+      "What code applies in my state?"
+    ],
+    "source_url": "https://codes.iccsafe.org/codes/united-states"
+  },
+  {
+    "source_or_code_family": "City / county amendments portal",
+    "type": "jurisdiction source",
+    "covers": "Local amendments and municipal code text.",
+    "typical_questions": [
+      "What does my city require beyond the state code?"
+    ],
+    "source_url": "https://codes.iccsafe.org/codes/united-states"
+  },
+  {
+    "source_or_code_family": "Healthcare overlay sources",
+    "type": "program-specific",
+    "covers": "Hospital and healthcare occupancies may trigger additional guidance or agency review.",
+    "typical_questions": [
+      "Hospital entrance doors",
+      "Smoke barriers",
+      "Patient room exceptions"
+    ],
+    "source_url": "https://www.access-board.gov/ada/guides/chapter-4-entrances-doors-and-gates/"
+  },
+  {
     "source_or_code_family": "School / education overlay sources",
     "type": "program-specific",
     "covers": "Education occupancy agency, fire marshal, district, and AHJ requirements.",

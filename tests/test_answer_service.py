@@ -19,6 +19,8 @@ def test_build_answer_uses_structured_context_for_product_match() -> None:
                 name="KD Masonry Frame",
                 category="frame",
                 reason="Matches the application: masonry opening.",
+                starting_price_usd=160,
+                fire_rating="Up to 3 hours",
             )
         ],
         code_references=[],
@@ -32,10 +34,13 @@ def test_build_answer_uses_structured_context_for_product_match() -> None:
         missing_information=["fire_rating"],
     )
 
-    assert "Product matching" in answer
+    assert "Dataset guidance:" in answer
     assert "KD Masonry Frame" in answer
-    assert "fire rating" in answer
-    assert "Masonry Frame Seed Case" in answer
+    assert "from $160" in answer
+    assert "rating: Up to 3 hours" in answer
+    assert "Fire rating" in answer
+    assert "united_doors_ai_training_dataset.pdf / Masonry Frame Seed Case" in answer
+    assert "What I need next:" in answer
 
 
 def test_build_answer_keeps_local_code_caveat() -> None:
@@ -63,9 +68,11 @@ def test_build_answer_keeps_local_code_caveat() -> None:
         missing_information=["state", "zip_code"],
     )
 
-    assert "Exact code guidance needs jurisdiction context" in answer
-    assert "starter dataset" in answer
-    assert "state, zip code" in answer
+    assert "Dataset guidance:" in answer
+    assert "Starter dataset" in answer
+    assert "Resolve adopted code editions and amendments" in answer
+    assert "What state is the project in?" in answer
+    assert "What ZIP code should I use" in answer
 
 
 def test_build_answer_can_use_llm_writer(monkeypatch) -> None:
@@ -92,6 +99,7 @@ def test_build_answer_can_use_llm_writer(monkeypatch) -> None:
         missing_information=["jurisdiction"],
     )
 
-    assert answer.startswith("LLM: Maglocks are conditional")
+    assert answer.startswith("LLM: Dataset-grounded starting point")
+    assert "matching dataset record" in answer
     assert captured_context["intent"] == "maglock_analysis"
     assert captured_context["missing_information"] == ["jurisdiction"]

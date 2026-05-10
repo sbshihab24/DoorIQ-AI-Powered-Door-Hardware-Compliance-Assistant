@@ -7,8 +7,21 @@ def test_code_seed_answer_mentions_jurisdiction_stack_and_source_urls() -> None:
         ChatRequest(message="What code applies to a school entrance in my state?")
     )
 
-    assert "jurisdiction stack" in response.answer
-    assert "source URLs" in response.answer
+    assert "Dataset guidance:" in response.answer
+    assert "local-code precision requires resolving ZIP to city, county, and state" in response.answer
+
+
+def test_code_answer_mentions_resolved_zip_verification_packet() -> None:
+    response = build_chat_response(
+        ChatRequest(
+            message="What code applies to a school entrance in my state?",
+            building={"building_type": "school", "application": "main entrance"},
+            location={"state": "TX", "zip_code": "77002"},
+        )
+    )
+
+    assert "TX / 77002 Code Verification Packet" in response.answer
+    assert response.code_references[0].url == "https://codes.iccsafe.org/"
 
 
 def test_operator_seed_answer_compares_operator_paths() -> None:
@@ -16,7 +29,7 @@ def test_operator_seed_answer_compares_operator_paths() -> None:
         ChatRequest(message="Do I need an automatic operator on a hospital entrance door?")
     )
 
-    assert "manual, low-energy, and full-power" in response.answer
+    assert "automatic-door preference" in response.answer
 
 
 def test_delayed_egress_seed_answer_mentions_ahj_review() -> None:
@@ -24,7 +37,7 @@ def test_delayed_egress_seed_answer_mentions_ahj_review() -> None:
         ChatRequest(message="Can I use delayed egress at a memory care unit?")
     )
 
-    assert "AHJ-review" in response.answer
+    assert "AHJ review" in response.answer
 
 
 def test_product_seed_answer_mentions_matched_product_list() -> None:
@@ -32,7 +45,7 @@ def test_product_seed_answer_mentions_matched_product_list() -> None:
         ChatRequest(message="What products on your site fit a 90-minute corridor pair?")
     )
 
-    assert "matched product list" in response.answer
+    assert "Recommended output: Matched product list" in response.answer
     assert response.recommended_products
 
 
@@ -41,9 +54,9 @@ def test_meta_seed_answer_lists_exact_answer_inputs() -> None:
         ChatRequest(message="What information do you need before giving an exact answer?")
     )
 
-    assert "state/ZIP" in response.answer
-    assert "building type" in response.answer
-    assert "access-control intent" in response.answer
+    assert response.intent == "general"
+    assert "What I need next:" in response.answer
+    assert "What type of building is it?" in response.answer
 
 
 def test_electrified_rated_opening_seed_answer_mentions_listed_components() -> None:
@@ -52,4 +65,4 @@ def test_electrified_rated_opening_seed_answer_mentions_listed_components() -> N
     )
 
     assert "listed components" in response.answer
-    assert "labeled assembly" in response.answer
+    assert "Recommended output: Conditional allow + listed components only" in response.answer
