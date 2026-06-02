@@ -17,9 +17,12 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Datasets & PDFs
 DoorIQ AI-Powered Door & Hardware Compliance Assistant__ solution_sqd __ Ariful.pdf
 united_doors_ai_training_dataset.pdf
 united-doors-chatbot-reference.pdf
+detailed_us_door_codes_reference.pdf
+detailed_us_door_codes_reference 2.pdf
 PROJECT_PLAN.md
 
 .env
