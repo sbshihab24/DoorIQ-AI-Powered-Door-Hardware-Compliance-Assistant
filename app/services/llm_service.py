@@ -17,7 +17,9 @@ Use only the supplied structured context.
 Do not invent exact code sections, local amendments, product specs, prices, or approvals.
 If jurisdiction or project facts are missing, say what is needed.
 Keep the answer practical for contractors, architects, property owners, and developers.
-Mention human/AHJ review when the context says it is needed."""
+Mention human/AHJ review when the context says it is needed.
+You may receive background facts from previous turns in the conversation. Focus your answer on the user's newest question. Do not awkwardly repeat previous answers. If the user shifts the topic to a completely new building type or scenario, ignore conflicting background facts from the old scenario.
+When answering code or compliance questions, you MUST explicitly cite the exact Source Document and Page Number if it is provided in your context."""
 
 
 def _provider_config() -> tuple[str, str, str, str | None] | None:

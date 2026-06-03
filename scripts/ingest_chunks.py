@@ -1,9 +1,11 @@
 from pathlib import Path
 import sys
 import hashlib
+# pyrefly: ignore [missing-import]
 from pypdf import PdfReader
 
 
+# pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session
 
 

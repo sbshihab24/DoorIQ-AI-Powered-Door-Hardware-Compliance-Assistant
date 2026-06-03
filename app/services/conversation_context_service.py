@@ -150,19 +150,7 @@ def _latest_non_general_user_message(db: Session, session_id: str) -> str | None
 
 
 def _recent_user_context(db: Session, session_id: str) -> str | None:
-    messages = (
-        db.query(ChatMessage)
-        .filter(ChatMessage.session_id == session_id, ChatMessage.role == "user")
-        .order_by(ChatMessage.id.desc())
-        .limit(6)
-        .all()
-    )
-    ordered_messages = [
-        message.content.strip()
-        for message in reversed(messages)
-        if message.content.strip()
-    ]
-    return " ".join(ordered_messages) if ordered_messages else None
+    return _latest_non_general_user_message(db, session_id)
 
 
 def _looks_like_context_update(message: str) -> bool:
@@ -219,10 +207,6 @@ def merge_conversation_context(db: Session, request: ChatRequest) -> ChatRequest
         if previous_context:
             message_for_response = f"{previous_context} {request.message}"
     elif request.session_id and current_intent == "general":
-        previous_context = _recent_user_context(db, request.session_id)
-        if previous_context:
-            message_for_response = f"{previous_context} {request.message}"
-    elif request.session_id and current_intent not in {"greeting", "out_of_scope"}:
         previous_context = _recent_user_context(db, request.session_id)
         if previous_context:
             message_for_response = f"{previous_context} {request.message}"
