@@ -11,41 +11,6 @@
     "source_url": "https://codes.iccsafe.org/"
   },
   {
-    "source_or_code_family": "IBC 1010.1.10",
-    "type": "model code section",
-    "covers": "Panic hardware required for Assembly and Educational occupancies with occupant load over 50. Panic devices generally mounted between 34 and 48 inches above floor. Hardware must unlatch with one motion per NFPA 101.",
-    "typical_questions": [
-      "What code section requires panic hardware in educational occupancies?",
-      "Do I need panic hardware for a school?",
-      "What code requires exit devices on assembly doors?",
-      "Panic hardware requirement educational"
-    ],
-    "source_url": "https://codes.iccsafe.org/content/IBC2021P2/chapter-10-means-of-egress"
-  },
-  {
-    "source_or_code_family": "IBC 1010.1.1",
-    "type": "model code section",
-    "covers": "Minimum clear width is generally 32 inches. Maximum leaf width typically 48 inches. Measurement is taken with door open 90 degrees.",
-    "typical_questions": [
-      "What is the minimum door clear width?",
-      "What code covers door width?",
-      "What is maximum leaf width?",
-      "Door clear width code section"
-    ],
-    "source_url": "https://codes.iccsafe.org/content/IBC2021P2/chapter-10-means-of-egress"
-  },
-  {
-    "source_or_code_family": "IBC 1010.1.2",
-    "type": "model code section",
-    "covers": "Egress doors serving occupant loads over 50 generally swing in direction of egress travel. Doors in egress paths must be readily openable from inside without keys in most occupancies. Exit access must remain unobstructed per NFPA 101.",
-    "typical_questions": [
-      "Which direction must egress doors swing?",
-      "Can egress doors be locked from inside?",
-      "What is the egress door swing rule?"
-    ],
-    "source_url": "https://codes.iccsafe.org/content/IBC2021P2/chapter-10-means-of-egress"
-  },
-  {
     "source_or_code_family": "Model code: IBC Chapter 10 Means of Egress",
     "type": "model code",
     "covers": "Door swing, egress, panic hardware, locking arrangements, and exit access conditions.",
@@ -57,47 +22,13 @@
     "source_url": "https://codes.iccsafe.org/content/IBC2021P2/chapter-10-means-of-egress"
   },
   {
-    "source_or_code_family": "ADA 404.2.3",
-    "type": "federal accessibility standard",
-    "covers": "Accessible doors require minimum 32-inch clear opening, measured with door open 90 degrees.",
-    "typical_questions": [
-      "What is the ADA minimum door width?",
-      "What clear width does ADA require?",
-      "ADA door opening width requirement?"
-    ],
-    "source_url": "https://www.access-board.gov/ada/"
-  },
-  {
-    "source_or_code_family": "ADA 404.2.4",
-    "type": "federal accessibility standard",
-    "covers": "Maneuvering clearances required on pull and push sides of accessible doors.",
-    "typical_questions": [
-      "What maneuvering clearance is required?",
-      "ADA clearance on pull side of door?",
-      "How much space needed beside accessible door?"
-    ],
-    "source_url": "https://www.access-board.gov/ada/"
-  },
-  {
-    "source_or_code_family": "ADA 404.2.7",
-    "type": "federal accessibility standard",
-    "covers": "Door hardware must not require tight grasping, pinching, or twisting of the wrist. Lever-style hardware is required for accessible operation.",
-    "typical_questions": [
-      "What ADA hardware is required on doors?",
-      "Can I use a knob on an accessible door?",
-      "ADA requirement for door lever handles?"
-    ],
-    "source_url": "https://www.access-board.gov/ada/"
-  },
-  {
     "source_or_code_family": "ADA 2010 Standards Chapter 4 / Section 404",
     "type": "federal accessibility standard",
-    "covers": "Accessible routes, clear width, maneuvering clearances, hardware controls, and automatic doors. Threshold height limited to 1/2 inch maximum. Opening force 5 lbs max for interior doors.",
+    "covers": "Accessible routes, clear width, maneuvering clearances, hardware controls, and automatic doors.",
     "typical_questions": [
       "Does this opening need ADA compliance?",
       "Is an operator required?",
-      "Are revolving doors allowed?",
-      "Maximum door opening force ADA?"
+      "Are revolving doors allowed?"
     ],
     "source_url": "https://www.access-board.gov/ada/"
   },
@@ -135,57 +66,21 @@
   {
     "source_or_code_family": "NFPA 80",
     "type": "fire door standard",
-    "covers": "Fire-rated doors must be self-closing and positively latched. Labels must remain visible and legible. Field modifications may void fire label. Fire doors between garage and residence require fire separation.",
+    "covers": "Fire doors, frames, hardware labels, modifications, inspections, self-closing, and positive latching.",
     "typical_questions": [
       "Can I change this rated door?",
-      "What hardware is allowed on a fire door?",
-      "Are fire doors required to be self-closing?",
-      "NFPA 80 self-closing requirement"
-    ],
-    "source_url": "https://codes.iccsafe.org/"
-  },
-  {
-    "source_or_code_family": "IBC 716",
-    "type": "model code section",
-    "covers": "Fire protection ratings depend on wall assembly rating. Glass in doors and sidelights often must be safety glazing.",
-    "typical_questions": [
-      "What fire rating does my door need based on wall assembly?",
-      "What does IBC 716 require?",
-      "Can I put glass in a fire-rated door?"
+      "What hardware is allowed on a fire door?"
     ],
     "source_url": "https://codes.iccsafe.org/"
   },
   {
     "source_or_code_family": "NFPA 101 Life Safety Code",
     "type": "life safety standard",
-    "covers": "Healthcare, assembly, educational, and other occupancy egress requirements. Hardware must unlatch with one motion.",
+    "covers": "Healthcare, assembly, educational, and other occupancy egress requirements.",
     "typical_questions": [
       "Hospital corridor openings",
       "School egress doors",
-      "Locking in healthcare units",
-      "Panic hardware unlatch one motion"
-    ],
-    "source_url": "https://codes.iccsafe.org/"
-  },
-  {
-    "source_or_code_family": "IRC R311",
-    "type": "residential code section",
-    "covers": "Required egress door minimum clear width generally 32 inches. Required egress door minimum height generally 78 inches. Landings required on each side of exterior doors.",
-    "typical_questions": [
-      "Residential egress door width?",
-      "What is IRC R311?",
-      "Minimum door height for residential egress?"
-    ],
-    "source_url": "https://codes.iccsafe.org/"
-  },
-  {
-    "source_or_code_family": "IRC R308",
-    "type": "residential code section",
-    "covers": "Tempered safety glass required near doors and hazardous locations. Tempered glazing rules depend on distance from walking surfaces and door edges.",
-    "typical_questions": [
-      "When is tempered glass required near doors?",
-      "What is IRC R308?",
-      "Safety glazing requirements for sidelights?"
+      "Locking in healthcare units"
     ],
     "source_url": "https://codes.iccsafe.org/"
   },
