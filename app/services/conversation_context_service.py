@@ -203,9 +203,13 @@ def merge_conversation_context(db: Session, request: ChatRequest) -> ChatRequest
         if previous_context:
             message_for_response = f"{previous_context} {request.message}"
     elif request.session_id and current_intent in {"product_match", "quote_handoff"}:
-        previous_context = _recent_user_context(db, request.session_id)
-        if previous_context:
-            message_for_response = f"{previous_context} {request.message}"
+        previous_message = _latest_non_general_user_message(db, request.session_id)
+        if previous_message:
+            previous_intent = detect_intent(previous_message)
+            # Only merge if the previous message was also product/quote related
+            # Do NOT merge if previous was a code lookup or different topic
+            if previous_intent in {"product_match", "quote_handoff", "general", "hardware_allowance", "door_type_recommendation"}:
+                message_for_response = f"{previous_message} {request.message}"
     elif request.session_id and current_intent == "general":
         previous_context = _recent_user_context(db, request.session_id)
         if previous_context:

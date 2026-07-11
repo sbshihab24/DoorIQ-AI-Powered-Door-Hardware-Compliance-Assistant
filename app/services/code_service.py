@@ -18,8 +18,8 @@ INTENT_ALIASES = {
 
 INTENT_CODE_TERMS = {
     "applicable_code_lookup": {"adoption", "amendments", "jurisdiction", "state", "city", "county", "local"},
-    "code_section_navigation": {"code", "section", "adopted", "edition", "amendments"},
-    "egress_analysis": {"egress", "exit", "panic", "locking", "swing", "life safety"},
+    "code_section_navigation": {"code", "section", "adopted", "edition", "amendments", "width", "height", "inches", "clear", "leaf", "minimum", "maximum", "measurement", "threshold", "force", "opening"},
+    "egress_analysis": {"egress", "exit", "panic", "locking", "swing", "life safety", "educational", "assembly", "occupant", "occupancy"},
     "fire_rating_analysis": {"fire", "rated", "label", "closing", "latching", "nfpa 80"},
     "accessibility_analysis": {"accessible", "accessibility", "ada", "clear", "operator", "maneuvering"},
     "automatic_operator_recommendation": {"automatic", "operator", "accessible", "ada", "entrances"},

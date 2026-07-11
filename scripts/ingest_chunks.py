@@ -38,6 +38,7 @@ def ingest_pdfs(db: Session) -> int:
     pdf_files = [
         "detailed_us_door_codes_reference 2.pdf",
         "detailed_us_door_codes_reference.pdf",
+        "united_doors_ai_training_dataset.pdf",
     ]
     total_chunks = 0
     for pdf_name in pdf_files:

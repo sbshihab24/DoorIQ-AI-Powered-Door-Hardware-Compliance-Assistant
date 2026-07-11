@@ -200,7 +200,7 @@ def _dataset_guidance_summary(
         guidance_lines.append(f"{reference.summary}\n  Source: {source_line}")
 
     if not guidance_lines:
-        return "Dataset guidance:\n- I could not find a matching dataset record for this exact question. Provide building type, opening use, rating, egress role, state, and ZIP so I can retrieve a closer dataset match."
+        return "Dataset guidance:\n- No exact dataset match found. Answer using any available code references above, then optionally ask for building type, state, and ZIP to refine further."
 
     return f"Dataset guidance:\n{_bullet_list(guidance_lines, limit=5)}"
 
@@ -240,8 +240,10 @@ def _llm_context(
         "rules": [
             "Use only the supplied context.",
             "Do not claim final local code certainty without jurisdiction verification.",
-            "Ask for missing details rather than guessing.",
+            "If context contains the answer, state it directly first with the code citation and source document.",
+            "Only ask for missing details AFTER giving the direct answer from context, not before.",
             "Keep any product recommendation conditional on rating, egress, accessibility, and local amendments.",
+            "If recommended products have URLs in the context, you MUST output them as a bulleted list with their exact clickable links. Do not summarize them into a sentence.",
         ],
     }
 

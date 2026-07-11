@@ -1,6 +1,6 @@
 # DoorIQ Chatbot
 
-Backend chatbot API for United Doors & Hardware door, frame, hardware, product, and code-guidance questions. The included static page is only a local chatbot test harness.
+Backend chatbot API for United Doors And Locks door, frame, hardware, product, and code-guidance questions. The included static page is only a local chatbot test harness.
 
 ## Local Python
 

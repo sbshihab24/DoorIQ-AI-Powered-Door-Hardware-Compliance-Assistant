@@ -203,6 +203,37 @@ def _wall_or_barrier_from_text(text: str) -> str | None:
     return None
 
 
+CITY_NAMES = {
+    "los angeles": "Los Angeles",
+    "new york": "New York",
+    "chicago": "Chicago",
+    "houston": "Houston",
+    "phoenix": "Phoenix",
+    "philadelphia": "Philadelphia",
+    "san antonio": "San Antonio",
+    "san diego": "San Diego",
+    "dallas": "Dallas",
+    "san jose": "San Jose",
+    "austin": "Austin",
+    "san francisco": "San Francisco",
+    "seattle": "Seattle",
+    "denver": "Denver",
+    "boston": "Boston",
+    "miami": "Miami",
+    "atlanta": "Atlanta",
+    "las vegas": "Las Vegas",
+    "portland": "Portland",
+    "sacramento": "Sacramento",
+}
+
+
+def _city_from_text(text: str) -> str | None:
+    for city_lower, city_display in CITY_NAMES.items():
+        if re.search(rf"\b{re.escape(city_lower)}\b", text):
+            return city_display
+    return None
+
+
 def extract_project_facts(request: ChatRequest) -> ProjectFacts:
     text = _full_text(request)
     building = request.building
@@ -250,10 +281,15 @@ def extract_project_facts(request: ChatRequest) -> ProjectFacts:
         access_control=True
         if re.search(r"\b(?:access control|maglock|electric strike|card reader|security)\b", text)
         else None,
-        occupant_load_known=bool(re.search(r"\b(?:occupant load|occupants|people|students|staff)\b", text)),
+        occupant_load_known=bool(
+            re.search(r"\b(?:occupant load|occupants|people|students|staff)\b", text)
+            or re.search(r"\b\d+\s*(?:occupant|person|people|students|staff)\b", text)
+            or re.search(r"\boccupant load\s*(?:is|of|:)?\s*\d+", text)
+            or re.search(r"\b\d{1,4}\s+(?:occupants|people)\b", text)
+        ),
         state=(location.state if location else None) or _state_from_text(text),
         zip_code=(location.zip_code if location else None) or _first_zip_code(text),
-        city=location.city if location else None,
+        city=(location.city if location else None) or _city_from_text(text),
         new_vs_existing=(
             True
             if re.search(r"\b(?:new construction|new work)\b", text)
